@@ -1,38 +1,47 @@
-/*
-  ==============================================================================
-
-    This file contains the basic startup code for a JUCE application.
-
-  ==============================================================================
-*/
+/* Copyright (c) 2025, Christian Ahrens
+ *
+ * This file is part of MTCtrigger <https://github.com/ChristianAhrens/MTCtrigger>
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 
 #include <JuceHeader.h>
+
 #include "MainComponent.h"
 
-//==============================================================================
-class NewProjectApplication  : public juce::JUCEApplication
+#include <CustomLookAndFeel.h>
+
+ //==============================================================================
+class MainApplication : public juce::JUCEApplication
 {
 public:
     //==============================================================================
-    NewProjectApplication() {}
+    MainApplication() {}
 
-    const juce::String getApplicationName() override       { return ProjectInfo::projectName; }
-    const juce::String getApplicationVersion() override    { return ProjectInfo::versionString; }
-    bool moreThanOneInstanceAllowed() override             { return true; }
+    const String getApplicationName() override { return ProjectInfo::projectName; }
+    const String getApplicationVersion() override { return ProjectInfo::versionString; }
+    bool moreThanOneInstanceAllowed() override { return true; }
 
     //==============================================================================
-    void initialise (const juce::String& commandLine) override
+    void initialise(const String& commandLine) override
     {
-        // This method is where you should put your application's initialisation code..
-
-        mainWindow.reset (new MainWindow (getApplicationName()));
+        mainWindow.reset(std::make_unique<MainWindow>(getApplicationName(), commandLine).release());
     }
 
     void shutdown() override
     {
-        // Add your application's shutdown code here..
-
-        mainWindow = nullptr; // (deletes our window)
+        mainWindow.reset();
     }
 
     //==============================================================================
@@ -43,11 +52,9 @@ public:
         quit();
     }
 
-    void anotherInstanceStarted (const juce::String& commandLine) override
+    void anotherInstanceStarted(const juce::String& commandLine) override
     {
-        // When another instance of the app is launched while this one is running,
-        // this method is invoked, and the commandLine parameter tells you what
-        // the other instance's command-line arguments were.
+        ignoreUnused(commandLine);
     }
 
     //==============================================================================
@@ -55,45 +62,76 @@ public:
         This class implements the desktop window that contains an instance of
         our MainComponent class.
     */
-    class MainWindow    : public juce::DocumentWindow
+    class MainWindow : public juce::DocumentWindow, juce::DarkModeSettingListener
     {
     public:
-        MainWindow (juce::String name)
-            : DocumentWindow (name,
-                              juce::Desktop::getInstance().getDefaultLookAndFeel()
-                                                          .findColour (juce::ResizableWindow::backgroundColourId),
-                              DocumentWindow::allButtons)
+        MainWindow(const juce::String& name, const juce::String& commandLine) : juce::DocumentWindow(name,
+            juce::Desktop::getInstance().getDefaultLookAndFeel()
+            .findColour(juce::ResizableWindow::backgroundColourId),
+            juce::DocumentWindow::allButtons)
         {
-            setUsingNativeTitleBar (true);
-            setContentOwned (new MainComponent(), true);
+            ignoreUnused(commandLine);
 
-           #if JUCE_IOS || JUCE_ANDROID
-            setFullScreen (true);
-           #else
-            setResizable (true, true);
-            centreWithSize (getWidth(), getHeight());
-           #endif
+            setUsingNativeTitleBar(true);
+            auto mainComponent = std::make_unique<MainComponent>();
+            mainComponent->onPaletteStyleChange = [=](int paletteStyle, bool followLocalStyle) {
+                m_followLocalStyle = followLocalStyle;
+                applyPaletteStyle(static_cast<JUCEAppBasics::CustomLookAndFeel::PaletteStyle>(paletteStyle));
+            };
+            setContentOwned(mainComponent.release(), true);
 
-            setVisible (true);
+#if JUCE_IOS || JUCE_ANDROID
+            setFullScreen(true);
+#elif JUCE_LINUX
+            juce::Desktop::getInstance().setKioskModeComponent(getTopLevelComponent());
+#else
+            setResizable(true, true);
+            centreWithSize(getWidth(), getHeight());
+#endif
+
+            setVisible(true);
+
+            juce::Desktop::getInstance().addDarkModeSettingListener(this);
+            darkModeSettingChanged(); // initially trigger correct colourscheme
+
+            //applyPaletteStyle(JUCEAppBasics::CustomLookAndFeel::PaletteStyle::PS_Dark);
         }
 
         void closeButtonPressed() override
         {
-            // This is called when the user tries to close this window. Here, we'll just
-            // ask the app to quit when this happens, but you can change this to do
-            // whatever you need.
-            JUCEApplication::getInstance()->systemRequestedQuit();
+            juce::JUCEApplication::getInstance()->systemRequestedQuit();
         }
 
-        /* Note: Be careful if you override any DocumentWindow methods - the base
-           class uses a lot of them, so by overriding you might break its functionality.
-           It's best to do all your work in your content component instead, but if
-           you really have to override any DocumentWindow methods, make sure your
-           subclass also calls the superclass's method.
-        */
+        void darkModeSettingChanged() override
+        {
+            if (!m_followLocalStyle)
+                return;
+
+            if (juce::Desktop::getInstance().isDarkModeActive())
+            {
+                // go dark
+                applyPaletteStyle(JUCEAppBasics::CustomLookAndFeel::PS_Dark);
+            }
+            else
+            {
+                // go light
+                applyPaletteStyle(JUCEAppBasics::CustomLookAndFeel::PS_Light);
+            }
+
+            lookAndFeelChanged();
+        }
+
+        void applyPaletteStyle(JUCEAppBasics::CustomLookAndFeel::PaletteStyle paletteStyle)
+        {
+            m_lookAndFeel = std::make_unique<JUCEAppBasics::CustomLookAndFeel>(paletteStyle);
+            juce::Desktop::getInstance().setDefaultLookAndFeel(m_lookAndFeel.get());
+        }
 
     private:
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
+        std::unique_ptr<juce::LookAndFeel>  m_lookAndFeel;
+        bool m_followLocalStyle = true;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
     };
 
 private:
@@ -102,4 +140,4 @@ private:
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION (NewProjectApplication)
+START_JUCE_APPLICATION(MainApplication)

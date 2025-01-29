@@ -1,12 +1,27 @@
+/* Copyright (c) 2025, Christian Ahrens
+ *
+ * This file is part of MTCtrigger <https://github.com/ChristianAhrens/MTCtrigger>
+ *
+ * This tool is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This tool is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this tool; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 #pragma once
 
 #include <JuceHeader.h>
 
-//==============================================================================
-/*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
+class MTCtriggerComponent;
+
 class MainComponent  : public juce::Component
 {
 public:
@@ -18,32 +33,13 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    //========================================================================*
+    std::function<void(int, bool)> onPaletteStyleChange;
+
 private:
     //==============================================================================
-    void updateAvailableDevices();
-    void handleDeviceSelection();
-    void sendMessage();
-    
-    bool parseTimecode();
-    void resetTimecode();
-    bool parseFramerate();
-    void resetFramerate();
-    
-    //==============================================================================
-    std::unique_ptr<juce::ComboBox>     m_devicesList;
-    std::unique_ptr<juce::TextEditor>   m_timecodeEditor;
-    std::unique_ptr<juce::TextEditor>   m_framerateEditor;
-    std::unique_ptr<juce::TextButton>   m_triggerButton;
-    
-    juce::Array<juce::MidiDeviceInfo>   m_currentMidiDevicesInfos;
-    std::unique_ptr<juce::MidiOutput>   m_midiOutput;
-    
-    int m_hours = 0;
-    int m_minutes = 0;
-    int m_seconds = 0;
-    int m_frames = 0;
-    int m_frameRate = 1; // 24fps=00, 25fps=01, 29,97fps=10, 30fps=11
-
+    std::unique_ptr<MTCtriggerComponent>    m_mtctComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
+
