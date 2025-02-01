@@ -37,12 +37,15 @@ public:
     void lookAndFeelChanged() override;
 
     //==============================================================================
-    void timerCallback() override;
-
-    //==============================================================================
     void setAndSendTimeCode(TimeStamp ts);
 
 private:
+    //==============================================================================
+    void timerCallback() override;
+
+    //==============================================================================
+    void setStartMilliseconds();
+
     //==============================================================================
     void updateAvailableDevices();
     void handleDeviceSelection();

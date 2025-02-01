@@ -46,9 +46,7 @@ MTCtriggerComponent::MTCtriggerComponent()
     m_startRunningButton->onClick = [=]() {
         if (m_startRunningButton && m_startRunningButton->getToggleState())
         {
-            m_startMillisecondsHiRes = juce::Time::getMillisecondCounterHiRes(); // get the counter start reference value
-            m_startMillisecondsHiRes -= (m_ts.getHours() * sc_millisInHour) + (m_ts.getMinutes() * sc_millisInMin) + (m_ts.getSeconds() * sc_millisInSec) + (m_ts.getFrames() * getCurrentFrameIntervalMs()); // add any offset from currently set TC value
-
+            setStartMilliseconds();
             startTimer(10);
         }
         else
@@ -130,6 +128,12 @@ void MTCtriggerComponent::timerCallback()
         setAndSendTimeCode(newTS);
 }
 
+void MTCtriggerComponent::setStartMilliseconds()
+{
+    m_startMillisecondsHiRes = juce::Time::getMillisecondCounterHiRes(); // get the counter start reference value
+    m_startMillisecondsHiRes -= (m_ts.getHours() * sc_millisInHour) + (m_ts.getMinutes() * sc_millisInMin) + (m_ts.getSeconds() * sc_millisInSec) + (m_ts.getFrames() * getCurrentFrameIntervalMs()); // add any offset from currently set TC value
+}
+
 void MTCtriggerComponent::lookAndFeelChanged()
 {
     auto startRunningButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::play_arrow24px_svg).get());
@@ -140,6 +144,8 @@ void MTCtriggerComponent::lookAndFeelChanged()
 void MTCtriggerComponent::setAndSendTimeCode(TimeStamp ts)
 {
     m_ts = ts;
+
+    setStartMilliseconds();
 
     sendMessage();
 }
