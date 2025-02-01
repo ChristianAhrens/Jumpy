@@ -71,6 +71,7 @@ MTCtriggerComponent::MTCtriggerComponent()
     for (int i = 0; i < sc_customTriggersGrid_RowCount * sc_customTriggersGrid_ColCount; i++)
     {
         m_customTriggers[i] = std::make_unique<CustomTriggerButton>(juce::String("CT") + juce::String(i));
+        m_customTriggers[i]->onTriggerClicked = [=](const TimeStamp& ts) { setAndSendTimeCode(ts); };
         addAndMakeVisible(m_customTriggers[i].get());
         m_customTriggersGrid.items.add(m_customTriggers[i].get());
     }
@@ -170,13 +171,9 @@ void MTCtriggerComponent::sendMessage()
 
 void MTCtriggerComponent::sendMessage(TimeStamp ts, int frameRate)
 {
-    juce::StringArray timeDigits = {
-        juce::String(ts.getHours()).paddedLeft('0', 2),
-        juce::String(ts.getMinutes()).paddedLeft('0', 2),
-        juce::String(ts.getSeconds()).paddedLeft('0', 2),
-        juce::String(ts.getFrames()).paddedLeft('0', 2) };
-    if (m_timecodeEditor) m_timecodeEditor->setText(timeDigits.joinIntoString(":"));
-    DBG(juce::String(__FUNCTION__) << " " << timeDigits.joinIntoString(":"));
+
+    if (m_timecodeEditor) m_timecodeEditor->setText(ts.toString());
+    DBG(juce::String(__FUNCTION__) << " " << ts.toString());
 
     if (!m_midiOutput)
         return;
@@ -196,19 +193,7 @@ bool MTCtriggerComponent::parseTimecode()
     if (!m_timecodeEditor)
         return false;
 
-    auto stringToTokenize = m_timecodeEditor->getText();
-    juce::StringArray time;
-    time.addTokens(stringToTokenize, ":", "");
-    if (time.size() != 4)
-    {
-        resetTimecode();
-        return false;
-    }
-    m_ts = TimeStamp(
-        time[0].getIntValue(),
-        time[1].getIntValue(),
-        time[2].getIntValue(),
-        time[3].getIntValue());
+    m_ts = TimeStamp::fromString(m_timecodeEditor->getText());
 
     return true;
 }
