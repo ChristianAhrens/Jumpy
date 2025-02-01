@@ -31,6 +31,10 @@
       </GROUP>
     </GROUP>
     <GROUP id="{B4C42B10-6A29-1C3A-435D-5CB7A9DE671E}" name="Source">
+      <FILE id="zGvReH" name="CustomTriggerButton.cpp" compile="1" resource="0"
+            file="Source/CustomTriggerButton.cpp"/>
+      <FILE id="N16FWW" name="CustomTriggerButton.h" compile="0" resource="0"
+            file="Source/CustomTriggerButton.h"/>
       <FILE id="f1Ee4v" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="M3Kq7o" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>

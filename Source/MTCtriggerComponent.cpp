@@ -18,6 +18,7 @@
 
 #include "MTCtriggerComponent.h"
 
+
 MTCtriggerComponent::MTCtriggerComponent()
     : juce::Component()
 {
@@ -46,7 +47,7 @@ MTCtriggerComponent::MTCtriggerComponent()
         if (m_startRunningButton && m_startRunningButton->getToggleState())
         {
             m_startMillisecondsHiRes = juce::Time::getMillisecondCounterHiRes(); // get the counter start reference value
-            m_startMillisecondsHiRes -= (m_hours * sc_millisInHour) + (m_minutes * sc_millisInMin) + (m_seconds * sc_millisInSec) + (m_frames * getCurrentFrameIntervalMs()); // add any offset from currently set TC value
+            m_startMillisecondsHiRes -= (m_ts.getHours() * sc_millisInHour) + (m_ts.getMinutes() * sc_millisInMin) + (m_ts.getSeconds() * sc_millisInSec) + (m_ts.getFrames() * getCurrentFrameIntervalMs()); // add any offset from currently set TC value
 
             startTimer(10);
         }
@@ -60,6 +61,19 @@ MTCtriggerComponent::MTCtriggerComponent()
     m_triggerTCButton = std::make_unique<juce::TextButton>("Trigger current TC", "SendMessage");
     m_triggerTCButton->onClick = [=]() { sendMessage(); };
     addAndMakeVisible(m_triggerTCButton.get());
+
+    m_customTriggersGrid.rowGap.pixels = sc_customTriggersGrid_NodeGap;
+    m_customTriggersGrid.columnGap.pixels = sc_customTriggersGrid_NodeGap;
+    for (int i = 0; i < sc_customTriggersGrid_ColCount; i++)
+        m_customTriggersGrid.templateColumns.add(juce::Grid::TrackInfo(juce::Grid::Fr(1)));
+    for (int i = 0; i < sc_customTriggersGrid_RowCount; i++)
+        m_customTriggersGrid.templateRows.add(juce::Grid::TrackInfo(juce::Grid::Fr(1)));
+    for (int i = 0; i < sc_customTriggersGrid_RowCount * sc_customTriggersGrid_ColCount; i++)
+    {
+        m_customTriggers[i] = std::make_unique<CustomTriggerButton>(juce::String("CT") + juce::String(i));
+        addAndMakeVisible(m_customTriggers[i].get());
+        m_customTriggersGrid.items.add(m_customTriggers[i].get());
+    }
 
     updateAvailableDevices();
 }
@@ -93,7 +107,7 @@ void MTCtriggerComponent::resized()
 
     bounds.removeFromTop(6);
 
-
+    m_customTriggersGrid.performLayout(bounds.reduced(1));
 }
 
 void MTCtriggerComponent::timerCallback()
@@ -109,8 +123,10 @@ void MTCtriggerComponent::timerCallback()
     overrunMillis += (seconds * sc_millisInSec);
     auto frames = int(int(elapsedMillisecondsHiRes - overrunMillis) / getCurrentFrameIntervalMs());
 
-    if (m_hours != hours || m_minutes != minutes || m_seconds != seconds || m_frames != frames)
-        setAndSendTimeCode(hours, minutes, seconds, frames);
+    auto newTS = TimeStamp(hours, minutes, seconds, frames);
+
+    if (newTS != m_ts)
+        setAndSendTimeCode(newTS);
 }
 
 void MTCtriggerComponent::lookAndFeelChanged()
@@ -120,12 +136,9 @@ void MTCtriggerComponent::lookAndFeelChanged()
     m_startRunningButton->setImages(startRunningButtonDrawable.get());
 }
 
-void MTCtriggerComponent::setAndSendTimeCode(int hours, int minutes, int seconds, int frames)
+void MTCtriggerComponent::setAndSendTimeCode(TimeStamp ts)
 {
-    m_hours = hours;
-    m_minutes = minutes;
-    m_seconds = seconds;
-    m_frames = frames;
+    m_ts = ts;
 
     sendMessage();
 }
@@ -152,16 +165,16 @@ void MTCtriggerComponent::handleDeviceSelection()
 
 void MTCtriggerComponent::sendMessage()
 {
-    sendMessage(m_hours, m_minutes, m_seconds, m_frames, m_frameRate);
+    sendMessage(m_ts, m_frameRate);
 }
 
-void MTCtriggerComponent::sendMessage(int hours, int minutes, int seconds, int frames, int frameRate)
+void MTCtriggerComponent::sendMessage(TimeStamp ts, int frameRate)
 {
     juce::StringArray timeDigits = {
-        juce::String(hours).paddedLeft('0', 2),
-        juce::String(minutes).paddedLeft('0', 2),
-        juce::String(seconds).paddedLeft('0', 2),
-        juce::String(frames).paddedLeft('0', 2) };
+        juce::String(ts.getHours()).paddedLeft('0', 2),
+        juce::String(ts.getMinutes()).paddedLeft('0', 2),
+        juce::String(ts.getSeconds()).paddedLeft('0', 2),
+        juce::String(ts.getFrames()).paddedLeft('0', 2) };
     if (m_timecodeEditor) m_timecodeEditor->setText(timeDigits.joinIntoString(":"));
     DBG(juce::String(__FUNCTION__) << " " << timeDigits.joinIntoString(":"));
 
@@ -169,10 +182,10 @@ void MTCtriggerComponent::sendMessage(int hours, int minutes, int seconds, int f
         return;
 
     unsigned char bytes[] = { 0x7F, 0x7F, 0x01, 0x01, 0x20, 0x00, 0x00, 0x00 };
-    bytes[4] = (hours & 0x1F) + ((frameRate << 5) & 0xE0);
-    bytes[5] = unsigned char(minutes);
-    bytes[6] = unsigned char(seconds);
-    bytes[7] = unsigned char (frames);
+    bytes[4] = (ts.getHours() & 0x1F) + ((frameRate << 5) & 0xE0);
+    bytes[5] = unsigned char(ts.getMinutes());
+    bytes[6] = unsigned char(ts.getSeconds());
+    bytes[7] = unsigned char (ts.getFrames());
     auto midiMessage = juce::MidiMessage::createSysExMessage(bytes, 8);
 
     m_midiOutput->sendMessageNow(midiMessage);
@@ -191,10 +204,11 @@ bool MTCtriggerComponent::parseTimecode()
         resetTimecode();
         return false;
     }
-    m_hours = time[0].getIntValue();
-    m_minutes = time[1].getIntValue();
-    m_seconds = time[2].getIntValue();
-    m_frames = time[3].getIntValue();
+    m_ts = TimeStamp(
+        time[0].getIntValue(),
+        time[1].getIntValue(),
+        time[2].getIntValue(),
+        time[3].getIntValue());
 
     return true;
 }
@@ -204,10 +218,7 @@ void MTCtriggerComponent::resetTimecode()
     if (m_timecodeEditor)
         m_timecodeEditor->setText("00:00:00:00");
 
-    m_hours = 0;
-    m_minutes = 0;
-    m_seconds = 0;
-    m_frames = 0;
+    m_ts.clear();
 }
 
 bool MTCtriggerComponent::parseFramerate()

@@ -22,6 +22,8 @@
 
 #include <FixedFontTextEditor.h>
 
+#include "CustomTriggerButton.h"
+
 class MTCtriggerComponent :   public juce::Component, juce::Timer
 {
 
@@ -38,13 +40,13 @@ public:
     void timerCallback() override;
 
     //==============================================================================
-    void setAndSendTimeCode(int hours, int minutes, int seconds, int frames);
+    void setAndSendTimeCode(TimeStamp ts);
 
 private:
     //==============================================================================
     void updateAvailableDevices();
     void handleDeviceSelection();
-    void sendMessage(int hours, int minutes, int seconds, int frames, int frameRate);
+    void sendMessage(TimeStamp ts, int frameRate);
     void sendMessage();
 
     bool parseTimecode();
@@ -62,13 +64,16 @@ private:
     std::unique_ptr<juce::DrawableButton>               m_startRunningButton;
     std::unique_ptr<juce::TextButton>                   m_triggerTCButton;
 
+    std::map<int, std::unique_ptr<CustomTriggerButton>> m_customTriggers;
+    juce::Grid                                          m_customTriggersGrid;
+    static constexpr int                                sc_customTriggersGrid_RowCount = 4;
+    static constexpr int                                sc_customTriggersGrid_ColCount = 3;
+    static constexpr double                             sc_customTriggersGrid_NodeGap = 2.0;
+
     juce::Array<juce::MidiDeviceInfo>                   m_currentMidiDevicesInfos;
     std::unique_ptr<juce::MidiOutput>                   m_midiOutput;
 
-    int m_hours = 0;
-    int m_minutes = 0;
-    int m_seconds = 0;
-    int m_frames = 0;
+    TimeStamp m_ts;
     int m_frameRate = 1; // 24fps=00, 25fps=01, 29,97fps=10, 30fps=11
     double m_startMillisecondsHiRes = 0.0;
 

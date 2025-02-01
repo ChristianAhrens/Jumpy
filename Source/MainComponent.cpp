@@ -28,7 +28,7 @@ MainComponent::MainComponent()
     m_mtctComponent = std::make_unique<MTCtriggerComponent>();
     addAndMakeVisible(m_mtctComponent.get());
     
-    setSize (200, 100);
+    setSize (300, 600);
 
 #if defined JUCE_IOS
     // iOS is updated via AppStore
