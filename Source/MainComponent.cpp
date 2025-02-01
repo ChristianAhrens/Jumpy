@@ -18,15 +18,15 @@
 
 #include "MainComponent.h"
 
-#include "MTCtriggerComponent.h"
+#include "JumperComponent.h"
 
 #include <CustomLookAndFeel.h>
 #include <WebUpdateDetector.h>
 
 MainComponent::MainComponent()
 {
-    m_mtctComponent = std::make_unique<MTCtriggerComponent>();
-    addAndMakeVisible(m_mtctComponent.get());
+    m_jumperComponent = std::make_unique<JumperComponent>();
+    addAndMakeVisible(m_jumperComponent.get());
     
     setSize (300, 600);
 
@@ -60,6 +60,6 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    m_mtctComponent->setBounds(getLocalBounds());
+    m_jumperComponent->setBounds(getLocalBounds());
 }
 

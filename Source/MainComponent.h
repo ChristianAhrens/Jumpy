@@ -20,7 +20,7 @@
 
 #include <JuceHeader.h>
 
-class MTCtriggerComponent;
+class JumperComponent;
 
 class MainComponent  : public juce::Component
 {
@@ -38,7 +38,7 @@ public:
 
 private:
     //==============================================================================
-    std::unique_ptr<MTCtriggerComponent>    m_mtctComponent;
+    std::unique_ptr<JumperComponent>    m_jumperComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
