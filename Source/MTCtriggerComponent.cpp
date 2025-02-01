@@ -186,9 +186,9 @@ void MTCtriggerComponent::sendMessage(TimeStamp ts, int frameRate)
 
     unsigned char bytes[] = { 0x7F, 0x7F, 0x01, 0x01, 0x20, 0x00, 0x00, 0x00 };
     bytes[4] = (ts.getHours() & 0x1F) + ((frameRate << 5) & 0xE0);
-    bytes[5] = unsigned char(ts.getMinutes());
-    bytes[6] = unsigned char(ts.getSeconds());
-    bytes[7] = unsigned char (ts.getFrames());
+    bytes[5] = static_cast<unsigned char>(ts.getMinutes());
+    bytes[6] = static_cast<unsigned char>(ts.getSeconds());
+    bytes[7] = static_cast<unsigned char>(ts.getFrames());
     auto midiMessage = juce::MidiMessage::createSysExMessage(bytes, 8);
 
     m_midiOutput->sendMessageNow(midiMessage);
