@@ -144,10 +144,10 @@ void CustomTriggerButton::showTriggerSettings()
             m_colourSelector->setColour(juce::ColourSelector::backgroundColourId, Colours::transparentBlack);
             addAndMakeVisible(m_colourSelector.get());
 
-            m_closeButton = std::make_unique<juce::TextButton>("CloseButton");
-            m_closeButton->setButtonText("Close");
-            m_closeButton->onClick = [=]() { findParentComponentOfClass<CallOutBox>()->exitModalState(0); };
-            addAndMakeVisible(m_closeButton.get());
+            m_okButton = std::make_unique<juce::TextButton>("OkButton");
+            m_okButton->setButtonText("Ok");
+            m_okButton->onClick = [=]() { findParentComponentOfClass<CallOutBox>()->exitModalState(0); };
+            addAndMakeVisible(m_okButton.get());
 
             setSize(300, 500);
         };
@@ -163,7 +163,7 @@ void CustomTriggerButton::showTriggerSettings()
 
             m_nameEdit->setBounds(bounds.removeFromTop(30).reduced(5));
             m_tcEdit->setBounds(bounds.removeFromTop(30).reduced(5));
-            m_closeButton->setBounds(bounds.removeFromBottom(30).removeFromRight(bounds.getWidth() / 2).reduced(1));
+            m_okButton->setBounds(bounds.removeFromBottom(30).removeFromRight(bounds.getWidth() / 2).reduced(1));
             bounds.removeFromBottom(20);
             m_colourSelector->setBounds(bounds.removeFromBottom(400));
         }
@@ -174,7 +174,7 @@ void CustomTriggerButton::showTriggerSettings()
         std::unique_ptr<juce::TextEditor>       m_nameEdit;
         std::unique_ptr<juce::TextEditor>       m_tcEdit;
         std::unique_ptr<juce::ColourSelector>   m_colourSelector;
-        std::unique_ptr<juce::TextButton>       m_closeButton;
+        std::unique_ptr<juce::TextButton>       m_okButton;
     };
 
 

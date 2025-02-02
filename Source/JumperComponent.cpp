@@ -27,14 +27,14 @@ JumperComponent::JumperComponent()
     m_devicesList->onChange = [=]() { handleDeviceSelection(); };
     addAndMakeVisible(m_devicesList.get());
 
-    m_timecodeEditor = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("tc");
+    m_timecodeEditor = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("tc", 0U, true);
     m_timecodeEditor->setInputFilter(new juce::TextEditor::LengthAndCharacterRestriction(11, "0123456789:"), true);
     m_timecodeEditor->onReturnKey = [=]() { if (!parseTimecode()) resetTimecode(); };
     m_timecodeEditor->onFocusLost = [=]() { if (!parseTimecode()) resetTimecode(); };
     resetTimecode();
     addAndMakeVisible(m_timecodeEditor.get());
 
-    m_framerateEditor = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("fr");
+    m_framerateEditor = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("fr", 0U, true);
     m_framerateEditor->setInputFilter(new juce::TextEditor::LengthAndCharacterRestriction(5, "0123456789.,"), true);
     m_framerateEditor->onReturnKey = [=]() { if (!parseFramerate()) resetFramerate(); };
     m_framerateEditor->onFocusLost = [=]() { if (!parseFramerate()) resetFramerate(); };
@@ -95,7 +95,7 @@ void JumperComponent::resized()
 
     bounds.removeFromTop(6);
 
-    auto valueBounds = bounds.removeFromTop(24);
+    auto valueBounds = bounds.removeFromTop(30);
     m_framerateEditor->setBounds(valueBounds.removeFromLeft(50).reduced(1));
     m_startRunningButton->setBounds(valueBounds.removeFromRight(valueBounds.getHeight()).reduced(1));
     m_timecodeEditor->setBounds(valueBounds.reduced(1));
