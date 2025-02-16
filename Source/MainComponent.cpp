@@ -22,6 +22,7 @@
 
 #include <CustomLookAndFeel.h>
 #include <WebUpdateDetector.h>
+#include <iOS_utils.h>
 
 MainComponent::MainComponent()
 {
@@ -60,6 +61,13 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    m_jumperComponent->setBounds(getLocalBounds());
+    auto safety = JUCEAppBasics::iOS_utils::getDeviceSafetyMargins();
+    auto safeBounds = getLocalBounds();
+    safeBounds.removeFromTop(safety._top);
+    safeBounds.removeFromBottom(safety._bottom);
+    safeBounds.removeFromLeft(safety._left);
+    safeBounds.removeFromRight(safety._right);
+    
+    m_jumperComponent->setBounds(safeBounds);
 }
 
