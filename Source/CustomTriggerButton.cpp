@@ -18,6 +18,8 @@
 
 #include "CustomTriggerButton.h"
 
+#include <FixedFontTextEditor.h>
+
 
 CustomTriggerButton::CustomTriggerButton(const juce::String& buttonName)
     : juce::Button(buttonName)
@@ -77,7 +79,8 @@ void CustomTriggerButton::mouseDown(const juce::MouseEvent& e)
 {
     if (!isEnabled())
     {
-        m_triggerDetails = TriggerDetails(getName(), juce::Colours::cornflowerblue, TimeStamp());
+        m_triggerDetails = TriggerDetails(getName(), juce::Colours::cornflowerblue, TimeStamp(),
+            juce::OSCMessage(juce::String("/") + juce::JUCEApplication::getInstance()->getApplicationName() + "/" + getName()));
         showTriggerSettings();
     }
 
@@ -130,11 +133,11 @@ void CustomTriggerButton::showTriggerSettings()
     public:
         TriggerSettingsComponent(const TriggerDetails& td)
         {
-            m_nameEdit = std::make_unique<juce::TextEditor>();
+            m_nameEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>();
             m_nameEdit->setText(td.m_Name);
             addAndMakeVisible(m_nameEdit.get());
 
-            m_tcEdit = std::make_unique<juce::TextEditor>();
+            m_tcEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>();
             m_tcEdit->setText(td.m_TS.toString());
             addAndMakeVisible(m_tcEdit.get());
 
@@ -144,17 +147,25 @@ void CustomTriggerButton::showTriggerSettings()
             m_colourSelector->setColour(juce::ColourSelector::backgroundColourId, Colours::transparentBlack);
             addAndMakeVisible(m_colourSelector.get());
 
+            m_oscLabel = std::make_unique<juce::Label>("oscLabel", "OSC:");
+            m_oscLabel->setJustificationType(juce::Justification::centredBottom);
+            addAndMakeVisible(m_oscLabel.get());
+
+            m_oscStringEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>();
+            m_oscStringEdit->setText(td.m_oscTrigger.getAddressPattern().toString());
+            addAndMakeVisible(m_oscStringEdit.get());
+
             m_okButton = std::make_unique<juce::TextButton>("OkButton");
             m_okButton->setButtonText("Ok");
             m_okButton->onClick = [=]() { findParentComponentOfClass<CallOutBox>()->exitModalState(0); };
             addAndMakeVisible(m_okButton.get());
 
-            setSize(300, 500);
+            setSize(300, 530);
         };
         ~TriggerSettingsComponent() override
         {
             if (onFinished)
-                onFinished(TriggerDetails(m_nameEdit->getText(), m_colourSelector->getCurrentColour(), TimeStamp(m_tcEdit->getText())));
+                onFinished(TriggerDetails(m_nameEdit->getText(), m_colourSelector->getCurrentColour(), TimeStamp(m_tcEdit->getText()), juce::OSCMessage(m_oscStringEdit->getText())));
         }
 
         void resized() override
@@ -165,16 +176,21 @@ void CustomTriggerButton::showTriggerSettings()
             m_tcEdit->setBounds(bounds.removeFromTop(30).reduced(5));
             m_okButton->setBounds(bounds.removeFromBottom(30).removeFromRight(bounds.getWidth() / 2).reduced(1));
             bounds.removeFromBottom(20);
+            auto oscBounds = bounds.removeFromBottom(30);
+            m_oscLabel->setBounds(oscBounds.removeFromLeft(40).reduced(0, 5));
+            m_oscStringEdit->setBounds(oscBounds.reduced(5));
             m_colourSelector->setBounds(bounds.removeFromBottom(400));
         }
 
         std::function<void(const TriggerDetails&)>  onFinished;
 
     private:
-        std::unique_ptr<juce::TextEditor>       m_nameEdit;
-        std::unique_ptr<juce::TextEditor>       m_tcEdit;
-        std::unique_ptr<juce::ColourSelector>   m_colourSelector;
-        std::unique_ptr<juce::TextButton>       m_okButton;
+        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_nameEdit;
+        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_tcEdit;
+        std::unique_ptr<juce::ColourSelector>               m_colourSelector;
+        std::unique_ptr<juce::Label>                        m_oscLabel;
+        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_oscStringEdit;
+        std::unique_ptr<juce::TextButton>                   m_okButton;
     };
 
 

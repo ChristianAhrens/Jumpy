@@ -100,16 +100,18 @@ public:
     struct TriggerDetails
     {
         TriggerDetails() = default;
-        TriggerDetails(const juce::String& name, const juce::Colour& colour, const TimeStamp& timestamp)
+        TriggerDetails(const juce::String& name, const juce::Colour& colour, const TimeStamp& timestamp, const juce::OSCMessage& oscTrigger)
         {
             m_Name = name;
             m_Colour = colour;
             m_TS = timestamp;
+            m_oscTrigger = oscTrigger;
         }
 
-        juce::String    m_Name;
-        juce::Colour    m_Colour;
-        TimeStamp       m_TS;
+        juce::String        m_Name;
+        juce::Colour        m_Colour;
+        TimeStamp           m_TS;
+        juce::OSCMessage    m_oscTrigger = { juce::OSCAddressPattern("/a/b"), 0 };
     };
 
 public:
