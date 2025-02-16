@@ -27,6 +27,9 @@ JumperComponent::JumperComponent()
     m_devicesList->onChange = [=]() { handleDeviceSelection(); };
     addAndMakeVisible(m_devicesList.get());
 
+    m_oscInfoLabel = std::make_unique<juce::Label>("oscInfo", "OSC Port: " + juce::String(sc_oscPortNumber));
+    addAndMakeVisible(m_oscInfoLabel.get());
+
     m_timecodeEditor = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("tc", 0U, true);
     m_timecodeEditor->setInputFilter(new juce::TextEditor::LengthAndCharacterRestriction(11, "0123456789:"), true);
     m_timecodeEditor->onReturnKey = [=]() { if (!parseTimecode()) resetTimecode(); };
@@ -75,6 +78,11 @@ JumperComponent::JumperComponent()
     }
 
     updateAvailableDevices();
+
+    m_oscServer = std::make_unique<juce::OSCReceiver>();
+    m_oscServer->addListener(this);
+    if (!m_oscServer->connect(sc_oscPortNumber))
+        DBG(juce::String(__FUNCTION__) << " OSCReceiver: connecting to port " << sc_oscPortNumber << " failed.");
 }
 
 JumperComponent::~JumperComponent()
@@ -91,7 +99,9 @@ void JumperComponent::resized()
 {
     auto bounds = getLocalBounds();
 
-    m_devicesList->setBounds(bounds.removeFromTop(30).reduced(1));
+    auto devSettingsBounds = bounds.removeFromTop(30);
+    m_devicesList->setBounds(devSettingsBounds.removeFromLeft(200).reduced(1));
+    m_oscInfoLabel->setBounds(devSettingsBounds);
 
     bounds.removeFromTop(6);
 
@@ -148,6 +158,30 @@ void JumperComponent::setAndSendTimeCode(TimeStamp ts)
     setStartMilliseconds();
 
     sendMessage();
+}
+
+void JumperComponent::oscMessageReceived(const OSCMessage& message)
+{
+    DBG(juce::String(__FUNCTION__) << " " << message.getAddressPattern().toString());
+
+    if (message.getAddressPattern().matches(juce::OSCAddress(juce::String("/") + juce::JUCEApplication::getInstance()->getApplicationName() + "/TS")) 
+        && 1 == message.size()
+        && juce::OSCTypes::string == message.begin()->getType())
+    {
+        auto ts = TimeStamp(message.begin()->getString());
+        if (ts.isValid())
+            setAndSendTimeCode(ts);
+    }
+    else
+    {
+        for (auto const& ct : m_customTriggers)
+        {
+            auto& customTriggerDetails = ct.second->getTriggerDetails();
+            auto customTriggerOSCAddress = juce::OSCAddress(customTriggerDetails.m_oscTrigger.getAddressPattern().toString());
+            if (message.getAddressPattern().matches(customTriggerOSCAddress) && customTriggerDetails.m_TS.isValid())
+                setAndSendTimeCode(ct.second->getTriggerDetails().m_TS);
+        }
+    }
 }
 
 

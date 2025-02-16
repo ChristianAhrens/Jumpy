@@ -42,7 +42,7 @@ CustomTriggerButton::~CustomTriggerButton()
 {
 }
 
-void CustomTriggerButton::setTriggerDetails(const TriggerDetails& triggerDetails)
+void CustomTriggerButton::setTriggerDetails(const CustomTriggerButton::TriggerDetails& triggerDetails)
 {
     if (!isEnabled())
         setEnabled(true);
@@ -62,6 +62,11 @@ void CustomTriggerButton::setTriggerDetails(const TriggerDetails& triggerDetails
     addAndMakeVisible(m_settingsButton.get());
 
     resized();
+}
+
+const CustomTriggerButton::TriggerDetails& CustomTriggerButton::getTriggerDetails() const
+{
+    return m_triggerDetails;
 }
 
 void CustomTriggerButton::clicked()

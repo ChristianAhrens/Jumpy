@@ -120,6 +120,7 @@ public:
     ~CustomTriggerButton() override;
 
     void setTriggerDetails(const TriggerDetails& triggerDetails);
+    const TriggerDetails& getTriggerDetails() const;
 
     //==============================================================================
     void clicked() override;

@@ -24,7 +24,7 @@
 
 #include "CustomTriggerButton.h"
 
-class JumperComponent :   public juce::Component, juce::Timer
+class JumperComponent :   public juce::Component, public juce::Timer, public juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>
 {
 
 public:
@@ -38,6 +38,9 @@ public:
 
     //==============================================================================
     void setAndSendTimeCode(TimeStamp ts);
+
+    //==============================================================================
+    void oscMessageReceived(const OSCMessage& message) override;
 
 private:
     //==============================================================================
@@ -62,6 +65,8 @@ private:
 
     //==============================================================================
     std::unique_ptr<juce::ComboBox>                     m_devicesList;
+    std::unique_ptr<juce::Label>                        m_oscInfoLabel;
+
     std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_timecodeEditor;
     std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_framerateEditor;
     std::unique_ptr<juce::DrawableButton>               m_startRunningButton;
@@ -76,6 +81,8 @@ private:
     juce::Array<juce::MidiDeviceInfo>                   m_currentMidiDevicesInfos;
     std::unique_ptr<juce::MidiOutput>                   m_midiOutput;
 
+    std::unique_ptr<juce::OSCReceiver>                  m_oscServer;
+
     TimeStamp m_ts;
     int m_frameRate = 1; // 24fps=00, 25fps=01, 29,97fps=10, 30fps=11
     double m_startMillisecondsHiRes = 0.0;
@@ -83,6 +90,8 @@ private:
     static constexpr int sc_millisInSec = 1000;
     static constexpr int sc_millisInMin = (1000 * 60);
     static constexpr int sc_millisInHour = (1000 * 60 * 60);
+
+    static constexpr int sc_oscPortNumber = 53000;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JumperComponent)
 };
