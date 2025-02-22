@@ -67,6 +67,9 @@ void MainComponent::resized()
 {
     auto safety = JUCEAppBasics::iOS_utils::getDeviceSafetyMargins();
     auto safeBounds = getLocalBounds();
+#if JUCE_IOS
+    safeBounds.reduced(3);
+#endif
     safeBounds.removeFromTop(safety._top);
     safeBounds.removeFromBottom(safety._bottom);
     safeBounds.removeFromLeft(safety._left);
