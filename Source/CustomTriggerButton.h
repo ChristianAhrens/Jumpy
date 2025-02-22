@@ -134,7 +134,7 @@ public:
             TriggerDetails td;
             td.m_Name = sa[0];
             td.m_Colour = juce::Colour::fromString(sa[1]);
-            td.m_TS.fromString(sa[2]);
+            td.m_TS = TimeStamp::fromString(sa[2]);
             td.m_oscTrigger.setAddressPattern(sa[3]);
 
             return td;
