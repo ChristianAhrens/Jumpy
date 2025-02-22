@@ -47,8 +47,8 @@ MainComponent::MainComponent()
 #else
     auto updater = JUCEAppBasics::WebUpdateDetector::getInstance();
     updater->SetReferenceVersion(ProjectInfo::versionString);
-    updater->SetDownloadUpdateWebAddress("https://github.com/christianahrens/MTCtrigger/releases/latest");
-    updater->CheckForNewVersion(true, "https://raw.githubusercontent.com/ChristianAhrens/MTCtrigger/refs/heads/main/");
+    updater->SetDownloadUpdateWebAddress("https://github.com/christianahrens/Jumper/releases/latest");
+    updater->CheckForNewVersion(true, "https://raw.githubusercontent.com/ChristianAhrens/Jumper/refs/heads/main/");
 #endif
 }
 
