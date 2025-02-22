@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/MTCtrigger>
+ * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -23,6 +23,10 @@
 #include <CustomLookAndFeel.h>
 #include <WebUpdateDetector.h>
 #include <iOS_utils.h>
+
+
+namespace Jumper
+{
 
 MainComponent::MainComponent()
 {
@@ -69,5 +73,7 @@ void MainComponent::resized()
     safeBounds.removeFromRight(safety._right);
     
     m_jumperComponent->setBounds(safeBounds);
+}
+
 }
 

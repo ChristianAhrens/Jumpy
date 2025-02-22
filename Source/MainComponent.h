@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/MTCtrigger>
+ * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -19,6 +19,10 @@
 #pragma once
 
 #include <JuceHeader.h>
+
+
+namespace Jumper
+{
 
 class JumperComponent;
 
@@ -41,5 +45,7 @@ private:
     std::unique_ptr<JumperComponent>    m_jumperComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+};
+
 };
 

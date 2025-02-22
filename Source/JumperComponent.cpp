@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/MTCtrigger>
+ * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -19,9 +19,25 @@
 #include "JumperComponent.h"
 
 
+namespace Jumper
+{
+
 JumperComponent::JumperComponent()
     : juce::Component()
 {
+    // create the configuration object (is being initialized from disk automatically)
+    m_config = std::make_unique<JumperConfiguration>(JUCEAppBasics::AppConfigurationBase::getDefaultConfigFilePath());
+    m_config->addDumper(this);
+
+    // check if config creation was able to read a valid config from disk...
+    if (!m_config->isValid())
+    {
+        m_config->ResetToDefault();
+    }
+
+    // add this main component to watchers
+    m_config->addWatcher(this, true); // this initial update cannot yet reach all parts of the app, esp. settings page that relies on fully initialized pagecomponentmanager, therefor a manual watcher update is triggered below
+
     m_devicesList = std::make_unique<juce::ComboBox>();
     m_devicesList->setTextWhenNothingSelected("Select MIDI output");
     m_devicesList->onChange = [=]() { handleDeviceSelection(); };
@@ -73,6 +89,7 @@ JumperComponent::JumperComponent()
     {
         m_customTriggers[i] = std::make_unique<CustomTriggerButton>(juce::String("CT") + juce::String(i));
         m_customTriggers[i]->onTriggerClicked = [=](const TimeStamp& ts) { setAndSendTimeCode(ts); };
+        m_customTriggers[i]->onDetailsChanged = [=](const CustomTriggerButton::TriggerDetails&) { if (m_config) m_config->triggerConfigurationDump(false); };
         addAndMakeVisible(m_customTriggers[i].get());
         m_customTriggersGrid.items.add(m_customTriggers[i].get());
     }
@@ -83,6 +100,9 @@ JumperComponent::JumperComponent()
     m_oscServer->addListener(this);
     if (!m_oscServer->connect(sc_oscPortNumber))
         DBG(juce::String(__FUNCTION__) << " OSCReceiver: connecting to port " << sc_oscPortNumber << " failed.");
+
+    // do the initial update for the whole application with config contents
+    m_config->triggerWatcherUpdate();
 }
 
 JumperComponent::~JumperComponent()
@@ -184,6 +204,73 @@ void JumperComponent::oscMessageReceived(const OSCMessage& message)
     }
 }
 
+void JumperComponent::performConfigurationDump()
+{
+    if (m_config)
+    {
+        auto stateXml = m_config->getConfigState();
+
+        if (stateXml)
+        {
+            auto deviceConfigXml = std::make_unique<juce::XmlElement>(JumperConfiguration::getTagName(JumperConfiguration::TagID::DEVCONFIG));
+            deviceConfigXml->setAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::FRAMERATE), juce::String(m_frameRate));
+            auto midiOutputXml = std::make_unique<juce::XmlElement>(JumperConfiguration::getTagName(JumperConfiguration::TagID::MIDIOUTPUT));
+            if (m_midiOutput) midiOutputXml->addTextElement(m_midiOutput->getIdentifier());
+            deviceConfigXml->addChildElement(midiOutputXml.release());
+            m_config->setConfigState(std::move(deviceConfigXml), JumperConfiguration::getTagName(JumperConfiguration::TagID::DEVCONFIG));
+
+            auto customTriggersXml = std::make_unique<juce::XmlElement>(JumperConfiguration::getTagName(JumperConfiguration::TagID::CUSTOMTRIGGERS));
+            for (auto const& customTrigger : m_customTriggers)
+            {
+                if (nullptr == customTrigger.second || !customTrigger.second->isEnabled() || customTrigger.second->getTriggerDetails().isEmpty())
+                    continue;
+                auto triggerDetailsXml = std::make_unique<juce::XmlElement>(JumperConfiguration::getTagName(JumperConfiguration::TagID::TRIGGERDETAILS));
+                triggerDetailsXml->setAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::IDENT), juce::String(customTrigger.first));
+                triggerDetailsXml->addTextElement(customTrigger.second->getTriggerDetails().toString());
+                customTriggersXml->addChildElement(triggerDetailsXml.release());
+            }
+            m_config->setConfigState(std::move(customTriggersXml), JumperConfiguration::getTagName(JumperConfiguration::TagID::CUSTOMTRIGGERS));
+        }
+    }
+}
+
+void JumperComponent::onConfigUpdated()
+{
+    auto deviceConfigXml = m_config->getConfigState(JumperConfiguration::getTagName(JumperConfiguration::TagID::DEVCONFIG));
+    if (deviceConfigXml)
+    {
+        m_frameRate = deviceConfigXml->getIntAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::FRAMERATE));
+        if (m_framerateEditor)
+            m_framerateEditor->setText(juce::String(getCurrentFrameRateHz()));
+
+        auto midiDeviceIdentifier = deviceConfigXml->getChildElementAllSubText(JumperConfiguration::getTagName(JumperConfiguration::TagID::MIDIOUTPUT), "");
+        if (midiDeviceIdentifier.isNotEmpty())
+            openMidiDevice(midiDeviceIdentifier);
+        if (m_devicesList)
+        {
+            auto iter = std::find_if(m_currentMidiDevicesInfos.begin(), m_currentMidiDevicesInfos.end(), [midiDeviceIdentifier](const juce::MidiDeviceInfo& devInfo) { return devInfo.identifier == midiDeviceIdentifier; });
+            if (nullptr == iter || iter == m_currentMidiDevicesInfos.end())
+                m_devicesList->setSelectedItemIndex(-1);
+            else
+                m_devicesList->setSelectedItemIndex(m_currentMidiDevicesInfos.indexOf(*iter));
+        }
+    }
+
+    auto customTriggersXml = m_config->getConfigState(JumperConfiguration::getTagName(JumperConfiguration::TagID::CUSTOMTRIGGERS));
+    if (customTriggersXml)
+    {
+        for (auto* elm : customTriggersXml->getChildWithTagNameIterator(JumperConfiguration::getTagName(JumperConfiguration::TagID::TRIGGERDETAILS)))
+        {
+            if (nullptr != elm)
+            {
+                auto key = elm->getIntAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::IDENT));
+                if (0 < m_customTriggers.count(key) && nullptr != m_customTriggers.at(key) && !m_customTriggers.at(key)->getTriggerDetails().isEmpty())
+                    m_customTriggers[key]->setTriggerDetails(CustomTriggerButton::TriggerDetails::fromString(elm->getAllSubText()));
+            }
+        }
+    }
+}
+
 
 //==============================================================================
 void JumperComponent::updateAvailableDevices()
@@ -200,7 +287,15 @@ void JumperComponent::updateAvailableDevices()
 void JumperComponent::handleDeviceSelection()
 {
     auto midiOutputIdentifier = m_currentMidiDevicesInfos[m_devicesList->getSelectedId() - 1].identifier;
-    m_midiOutput = juce::MidiOutput::openDevice(midiOutputIdentifier);
+    openMidiDevice(midiOutputIdentifier);
+
+    if (m_config)
+        m_config->triggerConfigurationDump();
+}
+
+void JumperComponent::openMidiDevice(const juce::String& deviceIdentifier)
+{
+    m_midiOutput = juce::MidiOutput::openDevice(deviceIdentifier);
     jassert(m_midiOutput);
 }
 
@@ -263,6 +358,9 @@ bool JumperComponent::parseFramerate()
     else
         return false;
 
+    if (m_config)
+        m_config->triggerConfigurationDump(false);
+
     return true;
 }
 
@@ -295,3 +393,5 @@ int JumperComponent::getCurrentFrameIntervalMs()
     return 1000 / getCurrentFrameRateHz();
 }
 
+
+};

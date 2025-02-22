@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/MTCtrigger>
+ * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -20,6 +20,9 @@
 
 #include <FixedFontTextEditor.h>
 
+
+namespace Jumper
+{
 
 CustomTriggerButton::CustomTriggerButton(const juce::String& buttonName)
     : juce::Button(buttonName)
@@ -62,6 +65,9 @@ void CustomTriggerButton::setTriggerDetails(const CustomTriggerButton::TriggerDe
     addAndMakeVisible(m_settingsButton.get());
 
     resized();
+
+    if (onDetailsChanged)
+        onDetailsChanged(m_triggerDetails);
 }
 
 const CustomTriggerButton::TriggerDetails& CustomTriggerButton::getTriggerDetails() const
@@ -204,3 +210,6 @@ void CustomTriggerButton::showTriggerSettings()
 
     juce::CallOutBox::launchAsynchronously(std::move(tsc), ((isEnabled() && m_settingsButton) ? m_settingsButton->getScreenBounds() : getScreenBounds()), nullptr);
 }
+
+}
+

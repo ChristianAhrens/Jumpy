@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/MTCtrigger>
+ * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -22,9 +22,18 @@
 
 #include <FixedFontTextEditor.h>
 
+#include "JumperConfiguration.h"
 #include "CustomTriggerButton.h"
 
-class JumperComponent :   public juce::Component, public juce::Timer, public juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>
+namespace Jumper
+{
+
+class JumperComponent :   
+    public juce::Component, 
+    public juce::Timer, 
+    public juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>,
+    public JumperConfiguration::Dumper,
+    public JumperConfiguration::Watcher
 {
 
 public:
@@ -42,6 +51,10 @@ public:
     //==============================================================================
     void oscMessageReceived(const OSCMessage& message) override;
 
+    //==========================================================================
+    void performConfigurationDump() override;
+    void onConfigUpdated() override;
+
 private:
     //==============================================================================
     void timerCallback() override;
@@ -52,6 +65,7 @@ private:
     //==============================================================================
     void updateAvailableDevices();
     void handleDeviceSelection();
+    void openMidiDevice(const juce::String& deviceIdentifier);
     void sendMessage(TimeStamp ts, int frameRate);
     void sendMessage();
 
@@ -83,6 +97,8 @@ private:
 
     std::unique_ptr<juce::OSCReceiver>                  m_oscServer;
 
+    std::unique_ptr<JumperConfiguration>                m_config;
+
     TimeStamp m_ts;
     int m_frameRate = 1; // 24fps=00, 25fps=01, 29,97fps=10, 30fps=11
     double m_startMillisecondsHiRes = 0.0;
@@ -94,5 +110,7 @@ private:
     static constexpr int sc_oscPortNumber = 53000;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JumperComponent)
+};
+
 };
 

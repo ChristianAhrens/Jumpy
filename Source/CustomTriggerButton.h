@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/MTCtrigger>
+ * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -19,6 +19,10 @@
 #pragma once
 
 #include <JuceHeader.h>
+
+
+namespace Jumper
+{
 
 class TimeStamp
 {
@@ -107,11 +111,38 @@ public:
             m_TS = timestamp;
             m_oscTrigger = oscTrigger;
         }
+        TriggerDetails(const juce::String& paramStr)
+        {
+            *this = fromString(paramStr);
+        }
 
         juce::String        m_Name;
         juce::Colour        m_Colour;
         TimeStamp           m_TS;
         juce::OSCMessage    m_oscTrigger = { juce::OSCAddressPattern("/a/b"), 0 };
+
+        juce::String toString() const
+        {
+            return m_Name + ";" + m_Colour.toString() + ";" + m_TS.toString() + ";" + m_oscTrigger.getAddressPattern().toString();
+        }
+        static TriggerDetails fromString(const juce::String& paramStr)
+        {
+            auto sa = juce::StringArray();
+            auto cnt = sa.addTokens(paramStr, ";", "");
+            jassert(4 == cnt);
+
+            TriggerDetails td;
+            td.m_Name = sa[0];
+            td.m_Colour = juce::Colour::fromString(sa[1]);
+            td.m_TS.fromString(sa[2]);
+            td.m_oscTrigger.setAddressPattern(sa[3]);
+
+            return td;
+        }
+        bool isEmpty() const
+        {
+            return m_Name.isEmpty() && m_Colour == juce::Colour() && m_TS == TimeStamp() && m_oscTrigger.getAddressPattern().toString().isEmpty();
+        }
     };
 
 public:
@@ -135,7 +166,8 @@ public:
     void lookAndFeelChanged() override;
 
     //==============================================================================
-    std::function<void(const TimeStamp&)>   onTriggerClicked;
+    std::function<void(const TimeStamp&)>       onTriggerClicked;
+    std::function<void(const TriggerDetails&)>  onDetailsChanged;
 
 private:
     //==============================================================================
@@ -151,5 +183,7 @@ private:
     std::unique_ptr<juce::DrawableButton>   m_settingsButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CustomTriggerButton)
+};
+
 };
 

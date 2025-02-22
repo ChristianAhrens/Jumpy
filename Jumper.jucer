@@ -8,6 +8,10 @@
   <MAINGROUP id="YIs3Nm" name="Jumper">
     <GROUP id="{60526C8C-38C9-8A62-4BE8-08FDFBF21423}" name="submodules">
       <GROUP id="{A748DC48-D24B-A4B1-772D-A48B7873F767}" name="JUCEAppBascics">
+        <FILE id="pFDBd4" name="AppConfigurationBase.cpp" compile="1" resource="0"
+              file="submodules/JUCE-AppBasics/Source/AppConfigurationBase.cpp"/>
+        <FILE id="tvvpfl" name="AppConfigurationBase.h" compile="0" resource="0"
+              file="submodules/JUCE-AppBasics/Source/AppConfigurationBase.h"/>
         <FILE id="Iogpyg" name="CustomLookAndFeel.cpp" compile="1" resource="0"
               file="submodules/JUCE-AppBasics/Source/CustomLookAndFeel.cpp"/>
         <FILE id="PHS72f" name="CustomLookAndFeel.h" compile="0" resource="0"
@@ -36,6 +40,7 @@
         <FILE id="IdwGXE" name="settings-24px.svg" compile="0" resource="1"
               file="submodules/JUCE-AppBasics/Resources/Images/settings-24px.svg"/>
       </GROUP>
+      <FILE id="hYzLTg" name="Default.config" compile="0" resource="1" file="Resources/Default.config"/>
     </GROUP>
     <GROUP id="{B4C42B10-6A29-1C3A-435D-5CB7A9DE671E}" name="Source">
       <FILE id="zGvReH" name="CustomTriggerButton.cpp" compile="1" resource="0"
@@ -46,6 +51,10 @@
             file="Source/JumperComponent.cpp"/>
       <FILE id="ccbf0k" name="JumperComponent.h" compile="0" resource="0"
             file="Source/JumperComponent.h"/>
+      <FILE id="JFcUC1" name="JumperConfiguration.cpp" compile="1" resource="0"
+            file="Source/JumperConfiguration.cpp"/>
+      <FILE id="aZcVM2" name="JumperConfiguration.h" compile="0" resource="0"
+            file="Source/JumperConfiguration.h"/>
       <FILE id="f1Ee4v" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="M3Kq7o" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
