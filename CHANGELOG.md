@@ -6,8 +6,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+- Added windows installer creation infrastructure
+- Added macOS DMG creation infrastructure
 
 ### Changed
 
 ### Fixed
 
+## [0.2.0] 2025-03-05
+### Added
+- Added OSC trigger assignment per custom button
+- Added OSC timecode value triggering
+- Added storing UI config to xml configuration file
+- Added iOS buildability
+
+### Changed
+- Updated app icon
+
+### Fixed
+
+## [0.1.0] 2025-02-02
+### Added
+- Added Initial release incl.
+-- MTC player
+-- MTC trigger send
+-- Custom MTC trigger buttons
+
+### Changed
+
+### Fixed
