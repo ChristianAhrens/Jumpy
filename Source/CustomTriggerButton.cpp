@@ -146,29 +146,35 @@ void CustomTriggerButton::showTriggerSettings()
         {
             m_nameEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>();
             m_nameEdit->setText(td.m_Name);
+            m_nameEdit->setExplicitFocusOrder(0);
             addAndMakeVisible(m_nameEdit.get());
 
             m_tcEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>();
             m_tcEdit->setText(td.m_TS.toString());
+            m_tcEdit->setExplicitFocusOrder(0);
             addAndMakeVisible(m_tcEdit.get());
 
             m_colourSelector = std::make_unique<juce::ColourSelector>();
             m_colourSelector->setName("Colour");
             m_colourSelector->setCurrentColour(td.m_Colour);
             m_colourSelector->setColour(juce::ColourSelector::backgroundColourId, Colours::transparentBlack);
+            m_colourSelector->setExplicitFocusOrder(0);
             addAndMakeVisible(m_colourSelector.get());
 
             m_oscLabel = std::make_unique<juce::Label>("oscLabel", "OSC:");
             m_oscLabel->setJustificationType(juce::Justification::centredBottom);
+            m_oscLabel->setExplicitFocusOrder(0);
             addAndMakeVisible(m_oscLabel.get());
 
             m_oscStringEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>();
             m_oscStringEdit->setText(td.m_oscTrigger.getAddressPattern().toString());
+            m_oscStringEdit->setExplicitFocusOrder(0);
             addAndMakeVisible(m_oscStringEdit.get());
 
             m_okButton = std::make_unique<juce::TextButton>("OkButton");
             m_okButton->setButtonText("Ok");
             m_okButton->onClick = [=]() { findParentComponentOfClass<CallOutBox>()->exitModalState(0); };
+            m_okButton->setExplicitFocusOrder(1);
             addAndMakeVisible(m_okButton.get());
 
             setSize(300, 530);
