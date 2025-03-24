@@ -35,8 +35,11 @@
         <FILE id="Gk0x85" name="JumperCanvas.png" compile="0" resource="1"
               file="Resources/Images/JumperCanvas.png"/>
         <FILE id="AIsoi6" name="JumperRect.png" compile="0" resource="1" file="Resources/Images/JumperRect.png"/>
+        <FILE id="HKxLML" name="menu_24dp.svg" compile="0" resource="1" file="submodules/JUCE-AppBasics/Resources/Images/menu_24dp.svg"/>
         <FILE id="Fgpjii" name="play_arrow-24px.svg" compile="0" resource="1"
               file="submodules/JUCE-AppBasics/Resources/Images/play_arrow-24px.svg"/>
+        <FILE id="K7Q71Y" name="question_mark_24dp.svg" compile="0" resource="1"
+              file="submodules/JUCE-AppBasics/Resources/Images/question_mark_24dp.svg"/>
         <FILE id="IdwGXE" name="settings-24px.svg" compile="0" resource="1"
               file="submodules/JUCE-AppBasics/Resources/Images/settings-24px.svg"/>
       </GROUP>

@@ -74,9 +74,12 @@ public:
 
             setUsingNativeTitleBar(true);
             auto mainComponent = std::make_unique<Jumper::MainComponent>();
-            mainComponent->onPaletteStyleChange = [=](int paletteStyle, bool followLocalStyle) {
+            mainComponent->getOnPaletteStyleChangeCallback() = [=](int paletteStyle, bool followLocalStyle) {
                 m_followLocalStyle = followLocalStyle;
-                applyPaletteStyle(static_cast<JUCEAppBasics::CustomLookAndFeel::PaletteStyle>(paletteStyle));
+                if (followLocalStyle)
+                    darkModeSettingChanged();
+                else
+                    applyPaletteStyle(static_cast<JUCEAppBasics::CustomLookAndFeel::PaletteStyle>(paletteStyle));
             };
             setContentOwned(mainComponent.release(), true);
 

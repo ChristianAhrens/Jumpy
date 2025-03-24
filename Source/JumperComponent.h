@@ -28,6 +28,11 @@
 namespace Jumper
 {
 
+/**
+ * fwd. Decls.
+ */
+class AboutComponent;
+
 class JumperComponent :   
     public juce::Component, 
     public juce::Timer, 
@@ -35,6 +40,18 @@ class JumperComponent :
     public JumperConfiguration::Dumper,
     public JumperConfiguration::Watcher
 {
+public:
+    enum JumperOptionsOption
+    {
+        ResetConfig = 1,
+        LookAndFeel_First,
+        LookAndFeel_FollowHost = LookAndFeel_First,
+        LookAndFeel_Dark,
+        LookAndFeel_Light,
+        LookAndFeel_Last = LookAndFeel_Light,
+        OscPort,
+        OutputDevice,
+    };
 
 public:
     JumperComponent();
@@ -48,12 +65,17 @@ public:
     //==============================================================================
     void setAndSendTimeCode(TimeStamp ts);
 
+    void connectToOscSocket();
+
     //==============================================================================
     void oscMessageReceived(const OSCMessage& message) override;
 
     //==========================================================================
     void performConfigurationDump() override;
     void onConfigUpdated() override;
+
+    //========================================================================*
+    std::function<void(int, bool)> onPaletteStyleChange;
 
 private:
     //==============================================================================
@@ -63,8 +85,13 @@ private:
     void setStartMilliseconds();
 
     //==============================================================================
+    void handleOptionsMenuResult(int selectedId);
+    void handleOptionsLookAndFeelMenuResult(int selectedId);
+    void handleOptionsOscPortMenuResult();
+    void handleOptionsOutputDeviceSelectionMenuResult(int selectedId);
+
+    //==============================================================================
     void updateAvailableDevices();
-    void handleDeviceSelection();
     void openMidiDevice(const juce::String& deviceIdentifier);
     void sendMessage(TimeStamp ts, int frameRate);
     void sendMessage();
@@ -77,9 +104,17 @@ private:
     int getCurrentFrameIntervalMs();
     int getCurrentFrameRateHz();
 
+    int getOscPortNumber();
+    void setOscPortNumber(int portNumber);
+
     //==============================================================================
-    std::unique_ptr<juce::ComboBox>                     m_devicesList;
-    std::unique_ptr<juce::Label>                        m_oscInfoLabel;
+    std::unique_ptr<juce::DrawableButton>               m_optionsButton;
+    std::map<int, std::pair<std::string, int>>          m_optionsItems;
+
+    std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_oscPortEdit;
+
+    std::unique_ptr<juce::DrawableButton>               m_aboutButton;
+    std::unique_ptr<AboutComponent>                     m_aboutComponent;
 
     std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_timecodeEditor;
     std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_framerateEditor;
@@ -92,7 +127,8 @@ private:
     static constexpr int                                sc_customTriggersGrid_ColCount = 3;
     static constexpr double                             sc_customTriggersGrid_NodeGap = 2.0;
 
-    juce::Array<juce::MidiDeviceInfo>                   m_currentMidiDevicesInfos;
+    juce::Array<juce::MidiDeviceInfo>                   m_currentMidiInputDevicesInfos;
+    juce::Array<juce::MidiDeviceInfo>                   m_currentMidiOutputDevicesInfos;
     std::unique_ptr<juce::MidiOutput>                   m_midiOutput;
 
     std::unique_ptr<juce::OSCReceiver>                  m_oscServer;
@@ -103,11 +139,11 @@ private:
     int m_frameRate = 1; // 24fps=00, 25fps=01, 29,97fps=10, 30fps=11
     double m_startMillisecondsHiRes = 0.0;
 
+    int m_oscPortNumber = 53000;
+
     static constexpr int sc_millisInSec = 1000;
     static constexpr int sc_millisInMin = (1000 * 60);
     static constexpr int sc_millisInHour = (1000 * 60 * 60);
-
-    static constexpr int sc_oscPortNumber = 53000;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JumperComponent)
 };

@@ -18,9 +18,187 @@
 
 #include "JumperComponent.h"
 
+#include <CustomLookAndFeel.h>
+
 
 namespace Jumper
 {
+
+
+class AboutComponent : public juce::Component
+{
+public:
+    AboutComponent(const char* imageData, int imageDataSize)
+        : juce::Component()
+    {
+        m_appIcon = std::make_unique<juce::DrawableButton>("App Icon", juce::DrawableButton::ButtonStyle::ImageFitted);
+        m_appIcon->setColour(juce::DrawableButton::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
+        m_appIcon->setColour(juce::DrawableButton::ColourIds::backgroundOnColourId, juce::Colours::transparentBlack);
+        m_appIcon->setImages(juce::Drawable::createFromImageData(imageData, imageDataSize).get());
+        addAndMakeVisible(m_appIcon.get());
+
+        m_appInfoLabel = std::make_unique<juce::Label>("Version", juce::JUCEApplication::getInstance()->getApplicationName() + " " + juce::JUCEApplication::getInstance()->getApplicationVersion());
+        m_appInfoLabel->setJustificationType(juce::Justification::centredBottom);
+        m_appInfoLabel->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)));
+        addAndMakeVisible(m_appInfoLabel.get());
+
+        m_appRepoLink = std::make_unique<juce::HyperlinkButton>(juce::JUCEApplication::getInstance()->getApplicationName() + juce::String(" on GitHub"), URL("https://www.github.com/ChristianAhrens/Jumper"));
+        m_appRepoLink->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)), false /* do not resize */);
+        m_appRepoLink->setJustificationType(juce::Justification::centredTop);
+        addAndMakeVisible(m_appRepoLink.get());
+    }
+
+    ~AboutComponent() override
+    {
+    }
+
+    //========================================================================*
+    void paint(juce::Graphics& g) override
+    {
+        g.fillAll(getLookAndFeel().findColour(juce::DrawableButton::backgroundColourId));
+
+        juce::Component::paint(g);
+    }
+
+    void resized() override
+    {
+        auto bounds = getLocalBounds();
+        auto margin = bounds.getHeight() / 8;
+        bounds.reduce(margin, margin);
+        auto iconBounds = bounds.removeFromTop(bounds.getHeight() / 2);
+        auto infoBounds = bounds.removeFromTop(bounds.getHeight() / 2);
+        auto& repoLinkBounds = bounds;
+
+        m_appIcon->setBounds(iconBounds);
+        m_appInfoLabel->setBounds(infoBounds);
+        m_appRepoLink->setBounds(repoLinkBounds);
+    }
+
+private:
+    std::unique_ptr<juce::DrawableButton>   m_appIcon;
+    std::unique_ptr<juce::Label>            m_appInfoLabel;
+    std::unique_ptr<juce::HyperlinkButton>  m_appRepoLink;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutComponent)
+};
+
+class PortEditComponent : public juce::Component
+{
+public:
+    PortEditComponent(int portNumber)
+        : PortEditComponent()
+    {
+        setPortValue(portNumber);
+    }
+    PortEditComponent()
+        : juce::Component()
+    {
+        m_portLabel = std::make_unique<juce::Label>("Port Label", "OSC port:");
+        m_portLabel->setJustificationType(juce::Justification::centredLeft);
+        m_portLabel->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)));
+        addAndMakeVisible(m_portLabel.get());
+
+        m_portEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("Port Edit");
+        m_portEdit->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)));
+        addAndMakeVisible(m_portEdit.get());
+    }
+
+    ~PortEditComponent() override
+    {
+    }
+
+    //========================================================================*
+    //void paint(juce::Graphics& g) override
+    //{
+    //    g.fillAll(getLookAndFeel().findColour(juce::DrawableButton::backgroundColourId));
+    //
+    //    juce::Component::paint(g);
+    //}
+
+    void resized() override
+    {
+        auto bounds = getLocalBounds();
+        m_portLabel->setBounds(bounds.removeFromTop(bounds.getHeight() /2).reduced(1));
+        m_portEdit->setBounds(bounds.reduced(1));
+    }
+
+    int getPortValue()
+    {
+        return m_portEdit->getTextValue().getValue();
+    }
+    void setPortValue(int portValue)
+    {
+        m_portEdit->getTextValue().setValue(portValue);
+    }
+
+private:
+    std::unique_ptr<juce::Label>                        m_portLabel;
+    std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_portEdit;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PortEditComponent)
+};
+
+class CustomAboutItem : public juce::PopupMenu::CustomComponent
+{
+public:
+    CustomAboutItem(juce::Component* componentToHold, juce::Rectangle<int> minIdealSize)
+    {
+        m_component = componentToHold;
+        addAndMakeVisible(m_component);
+
+        m_minIdealSize = minIdealSize;
+    }
+    virtual ~CustomAboutItem() = default;
+
+    void getIdealSize(int& idealWidth, int& idealHeight) override
+    {
+        auto resultingIdealSize = juce::Rectangle<int>(idealWidth, idealHeight);
+        auto mc = juce::Desktop::getInstance().getComponent(0);
+        if (mc)
+        {
+            auto fBounds = mc->getBounds().toFloat();
+            auto h = fBounds.getHeight();
+            auto w = fBounds.getWidth();
+            if (h > 0.0f && w > 0.0f)
+            {
+                if (h > w)
+                {
+                    w = 0.75f * w;
+                    h = w;
+                }
+                else
+                {
+                    h = 0.75f * h;
+                    w = h;
+                }
+
+                resultingIdealSize = juce::Rectangle<float>(w, h).toNearestInt();
+            }
+        }
+
+        if (resultingIdealSize.getWidth() < m_minIdealSize.getWidth() && resultingIdealSize.getHeight() < m_minIdealSize.getHeight())
+        {
+            idealWidth = m_minIdealSize.getWidth();
+            idealHeight = m_minIdealSize.getHeight();
+        }
+        else
+        {
+            idealWidth = resultingIdealSize.getWidth();
+            idealHeight = resultingIdealSize.getHeight();
+        }
+    }
+
+    void resized() override
+    {
+        if (m_component)
+            m_component->setBounds(getLocalBounds());
+    }
+
+private:
+    juce::Component* m_component = nullptr;
+    juce::Rectangle<int>    m_minIdealSize;
+};
+
 
 JumperComponent::JumperComponent()
     : juce::Component()
@@ -38,13 +216,55 @@ JumperComponent::JumperComponent()
     // add this main component to watchers
     m_config->addWatcher(this, true); // this initial update cannot yet reach all parts of the app, esp. settings page that relies on fully initialized pagecomponentmanager, therefor a manual watcher update is triggered below
 
-    m_devicesList = std::make_unique<juce::ComboBox>();
-    m_devicesList->setTextWhenNothingSelected("Select MIDI output");
-    m_devicesList->onChange = [=]() { handleDeviceSelection(); };
-    addAndMakeVisible(m_devicesList.get());
+    // reset trigger does not need default
+    m_optionsItems[JumperOptionsOption::ResetConfig] = std::make_pair("Reset config", 0);
+    // default lookandfeel is follow local, therefor none selected
+    m_optionsItems[JumperOptionsOption::LookAndFeel_FollowHost] = std::make_pair("Automatic", 1);
+    m_optionsItems[JumperOptionsOption::LookAndFeel_Dark] = std::make_pair("Dark", 0);
+    m_optionsItems[JumperOptionsOption::LookAndFeel_Light] = std::make_pair("Light", 0);
+    // default output visu is normal meterbridge
+    m_optionsItems[JumperOptionsOption::OscPort] = std::make_pair("OSC Port", 1);
 
-    m_oscInfoLabel = std::make_unique<juce::Label>("oscInfo", "OSC Port: " + juce::String(sc_oscPortNumber));
-    addAndMakeVisible(m_oscInfoLabel.get());
+    m_oscPortEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("OSC port editor");
+
+    m_optionsButton = std::make_unique<juce::DrawableButton>("Options", juce::DrawableButton::ButtonStyle::ImageFitted);
+    m_optionsButton->setTooltip(juce::JUCEApplication::getInstance()->getApplicationName() + " Options");
+    m_optionsButton->onClick = [this] {
+        juce::PopupMenu lookAndFeelSubMenu;
+        for (int i = JumperOptionsOption::LookAndFeel_First; i <= JumperOptionsOption::LookAndFeel_Last; i++)
+            lookAndFeelSubMenu.addItem(i, m_optionsItems[i].first, true, m_optionsItems[i].second == 1);
+
+        juce::PopupMenu midiOutputSubMenu;
+        m_currentMidiOutputDevicesInfos = juce::MidiOutput::getAvailableDevices();
+        for (int i = JumperOptionsOption::OutputDevice; i < JumperOptionsOption::OutputDevice + m_currentMidiOutputDevicesInfos.size(); i++)
+            midiOutputSubMenu.addItem(i, m_optionsItems[i].first, true, m_optionsItems[i].second == 1);
+
+        juce::PopupMenu optionsMenu;
+        optionsMenu.addSubMenu("LookAndFeel", lookAndFeelSubMenu);
+        optionsMenu.addSubMenu("MIDI output device", midiOutputSubMenu);
+        optionsMenu.addSeparator();
+        optionsMenu.addItem(JumperOptionsOption::OscPort, "OSC port: " + juce::String(m_oscPortNumber));
+        optionsMenu.addSeparator();
+        optionsMenu.addItem(JumperOptionsOption::ResetConfig, "Reset configuration");
+        optionsMenu.showMenuAsync(juce::PopupMenu::Options(), [=](int selectedId) { handleOptionsMenuResult(selectedId); });
+    };
+    m_optionsButton->setAlwaysOnTop(true);
+    m_optionsButton->setColour(juce::DrawableButton::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
+    m_optionsButton->setColour(juce::DrawableButton::ColourIds::backgroundOnColourId, juce::Colours::transparentBlack);
+    addAndMakeVisible(m_optionsButton.get());
+
+    m_aboutComponent = std::make_unique<AboutComponent>(BinaryData::JumperRect_png, BinaryData::JumperRect_pngSize);
+    m_aboutButton = std::make_unique<juce::DrawableButton>("About", juce::DrawableButton::ButtonStyle::ImageFitted);
+    m_aboutButton->setTooltip(juce::String("About") + juce::JUCEApplication::getInstance()->getApplicationName());
+    m_aboutButton->onClick = [this] {
+        juce::PopupMenu aboutMenu;
+        aboutMenu.addCustomItem(1, std::make_unique<CustomAboutItem>(m_aboutComponent.get(), juce::Rectangle<int>(250, 250)), nullptr, juce::String("Info about") + juce::JUCEApplication::getInstance()->getApplicationName());
+        aboutMenu.showMenuAsync(juce::PopupMenu::Options());
+    };
+    m_aboutButton->setAlwaysOnTop(true);
+    m_aboutButton->setColour(juce::DrawableButton::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
+    m_aboutButton->setColour(juce::DrawableButton::ColourIds::backgroundOnColourId, juce::Colours::transparentBlack);
+    addAndMakeVisible(m_aboutButton.get());
 
     m_timecodeEditor = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("tc", 0U, true);
     m_timecodeEditor->setInputFilter(new juce::TextEditor::LengthAndCharacterRestriction(11, "0123456789:"), true);
@@ -96,10 +316,7 @@ JumperComponent::JumperComponent()
 
     updateAvailableDevices();
 
-    m_oscServer = std::make_unique<juce::OSCReceiver>();
-    m_oscServer->addListener(this);
-    if (!m_oscServer->connect(sc_oscPortNumber))
-        DBG(juce::String(__FUNCTION__) << " OSCReceiver: connecting to port " << sc_oscPortNumber << " failed.");
+    connectToOscSocket();
 
     // do the initial update for the whole application with config contents
     m_config->triggerWatcherUpdate();
@@ -119,13 +336,13 @@ void JumperComponent::resized()
 {
     auto bounds = getLocalBounds();
 
-    auto devSettingsBounds = bounds.removeFromTop(30);
-    m_devicesList->setBounds(devSettingsBounds.removeFromLeft(200).reduced(1));
-    m_oscInfoLabel->setBounds(devSettingsBounds);
+    auto headerBounds = bounds.removeFromTop(30);
+    m_optionsButton->setBounds(headerBounds.removeFromLeft(headerBounds.getHeight()).reduced(1));
+    m_aboutButton->setBounds(headerBounds.removeFromRight(headerBounds.getHeight()).reduced(2));
 
-    bounds.removeFromTop(6);
+    bounds.removeFromTop(1);
 
-    auto valueBounds = bounds.removeFromTop(30);
+    auto valueBounds = bounds.removeFromTop(34);
     m_framerateEditor->setBounds(valueBounds.removeFromLeft(50).reduced(1));
     m_startRunningButton->setBounds(valueBounds.removeFromRight(valueBounds.getHeight()).reduced(1));
     m_timecodeEditor->setBounds(valueBounds.reduced(1));
@@ -166,6 +383,14 @@ void JumperComponent::setStartMilliseconds()
 
 void JumperComponent::lookAndFeelChanged()
 {
+    auto optionsButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::menu_24dp_svg).get());
+    optionsButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
+    m_optionsButton->setImages(optionsButtonDrawable.get());
+
+    auto aboutButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::question_mark_24dp_svg).get());
+    aboutButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
+    m_aboutButton->setImages(aboutButtonDrawable.get());
+
     auto startRunningButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::play_arrow24px_svg).get());
     startRunningButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
     m_startRunningButton->setImages(startRunningButtonDrawable.get());
@@ -178,6 +403,21 @@ void JumperComponent::setAndSendTimeCode(TimeStamp ts)
     setStartMilliseconds();
 
     sendMessage();
+}
+
+void JumperComponent::connectToOscSocket()
+{
+    if (m_oscServer)
+    {
+        m_oscServer->disconnect();
+        m_oscServer->removeListener(this);
+        m_oscServer.reset();
+    }
+
+    m_oscServer = std::make_unique<juce::OSCReceiver>();
+    m_oscServer->addListener(this);
+    if (!m_oscServer->connect(getOscPortNumber()))
+        juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", juce::String("OSCReceiver: connecting to port ") + juce::String(getOscPortNumber()) + " failed.");
 }
 
 void JumperComponent::oscMessageReceived(const OSCMessage& message)
@@ -245,14 +485,10 @@ void JumperComponent::onConfigUpdated()
 
         auto midiDeviceIdentifier = deviceConfigXml->getChildElementAllSubText(JumperConfiguration::getTagName(JumperConfiguration::TagID::MIDIOUTPUT), "");
         if (midiDeviceIdentifier.isNotEmpty())
-            openMidiDevice(midiDeviceIdentifier);
-        if (m_devicesList)
         {
-            auto iter = std::find_if(m_currentMidiDevicesInfos.begin(), m_currentMidiDevicesInfos.end(), [midiDeviceIdentifier](const juce::MidiDeviceInfo& devInfo) { return devInfo.identifier == midiDeviceIdentifier; });
-            if (nullptr == iter || iter == m_currentMidiDevicesInfos.end())
-                m_devicesList->setSelectedItemIndex(-1);
-            else
-                m_devicesList->setSelectedItemIndex(m_currentMidiDevicesInfos.indexOf(*iter));
+            for (auto i = 0; i <= m_optionsItems.size() - JumperOptionsOption::OutputDevice; i++)
+                m_optionsItems[JumperOptionsOption::OutputDevice + i].second = m_optionsItems[JumperOptionsOption::OutputDevice + i].first == midiDeviceIdentifier;
+            openMidiDevice(midiDeviceIdentifier);
         }
     }
 
@@ -273,24 +509,119 @@ void JumperComponent::onConfigUpdated()
 
 
 //==============================================================================
-void JumperComponent::updateAvailableDevices()
-{
-    if (!m_devicesList)
-        return;
 
-    m_currentMidiDevicesInfos = juce::MidiOutput::getAvailableDevices();
-    m_devicesList->clear();
-    for (int i = 0; i < m_currentMidiDevicesInfos.size(); i++)
-        m_devicesList->addItem(m_currentMidiDevicesInfos[i].name, i + 1);
+void JumperComponent::handleOptionsMenuResult(int selectedId)
+{
+    if (0 == selectedId)
+        return; // nothing selected, dismiss
+    else if (JumperOptionsOption::ResetConfig == selectedId)
+    {
+        if (m_config)
+            m_config->ResetToDefault();
+    }
+    else if (JumperOptionsOption::LookAndFeel_First <= selectedId && JumperOptionsOption::LookAndFeel_Last >= selectedId)
+        handleOptionsLookAndFeelMenuResult(selectedId);
+    else if (JumperOptionsOption::OscPort == selectedId)
+        handleOptionsOscPortMenuResult();
+    else if (JumperOptionsOption::OutputDevice <= selectedId)
+        handleOptionsOutputDeviceSelectionMenuResult(selectedId);
+    else
+        jassertfalse; // unhandled menu entry!?
 }
 
-void JumperComponent::handleDeviceSelection()
+void JumperComponent::handleOptionsLookAndFeelMenuResult(int selectedId)
 {
-    auto midiOutputIdentifier = m_currentMidiDevicesInfos[m_devicesList->getSelectedId() - 1].identifier;
-    openMidiDevice(midiOutputIdentifier);
+    // helper internal function to avoid code clones
+    std::function<void(int, int, int)> setSettingsItemsCheckState = [=](int a, int b, int c) {
+        m_optionsItems[JumperOptionsOption::LookAndFeel_FollowHost].second = a;
+        m_optionsItems[JumperOptionsOption::LookAndFeel_Dark].second = b;
+        m_optionsItems[JumperOptionsOption::LookAndFeel_Light].second = c;
+        };
 
-    if (m_config)
-        m_config->triggerConfigurationDump();
+    switch (selectedId)
+    {
+    case JumperOptionsOption::LookAndFeel_FollowHost:
+        setSettingsItemsCheckState(1, 0, 0);
+        if (onPaletteStyleChange)
+            onPaletteStyleChange(-1, true);
+        break;
+    case JumperOptionsOption::LookAndFeel_Dark:
+        setSettingsItemsCheckState(0, 1, 0);
+        if (onPaletteStyleChange)
+            onPaletteStyleChange(JUCEAppBasics::CustomLookAndFeel::PS_Dark, false);
+        break;
+    case JumperOptionsOption::LookAndFeel_Light:
+        setSettingsItemsCheckState(0, 0, 1);
+        if (onPaletteStyleChange)
+            onPaletteStyleChange(JUCEAppBasics::CustomLookAndFeel::PS_Light, false);
+        break;
+    default:
+        jassertfalse; // unknown id fed in unintentionally ?!
+        break;
+    }
+}
+
+void JumperComponent::handleOptionsOscPortMenuResult()
+{
+    //juce::AlertWindow messageBox("OSC port", "OSC port to open and listen on for incoming data:", juce::MessageBoxIconType::NoIcon);
+    //messageBox.addTextEditor("OSC port", juce::String(getOscPortNumber()), "OSC port");
+    //messageBox.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+    //messageBox.addButton("Ok", 0, juce::KeyPress(juce::KeyPress::returnKey));
+    //messageBox.enterModalState();
+    //messageBox.setVisible(true);
+    //messageBox.toFront(true);
+
+    m_oscPortEdit->setText(juce::String(m_oscPortNumber));
+    m_oscPortEdit->setVisible(true);
+
+    juce::AlertWindow::showAsync(
+        juce::MessageBoxOptions()
+            .withTitle("OSC port")
+            .withMessage("OSC port to open and listen on for incoming data:")
+            .withAssociatedComponent(m_oscPortEdit.get())
+            .withButton("Cancel")
+            .withButton("Ok"),
+        [=](int buttonIndex) {
+            if (buttonIndex == 1)
+            {
+
+            }
+            else if (buttonIndex == 0)
+            {
+                m_oscPortNumber = m_oscPortEdit->getTextValue().getValue();
+            }
+
+            m_oscPortEdit->setVisible(false);
+        });
+}
+
+void JumperComponent::handleOptionsOutputDeviceSelectionMenuResult(int selectedId)
+{
+    int selectedDeviceIdx = selectedId - JumperOptionsOption::OutputDevice;
+    if (JumperOptionsOption::OutputDevice + selectedDeviceIdx <= m_optionsItems.size() && selectedDeviceIdx <= m_currentMidiOutputDevicesInfos.size())
+    {
+        for (auto i = 0; i <= m_optionsItems.size() - JumperOptionsOption::OutputDevice; i++)
+            m_optionsItems[JumperOptionsOption::OutputDevice + i].second = i == selectedDeviceIdx;
+        auto midiOutputIdentifier = m_currentMidiOutputDevicesInfos[selectedDeviceIdx].identifier;
+        openMidiDevice(midiOutputIdentifier);
+
+        if (m_config)
+            m_config->triggerConfigurationDump();
+    }
+    else
+    {
+        jassertfalse;
+    }
+}
+
+void JumperComponent::updateAvailableDevices()
+{
+    m_currentMidiOutputDevicesInfos = juce::MidiOutput::getAvailableDevices();
+    for (int i = 0; i < m_currentMidiOutputDevicesInfos.size(); i++)
+    {
+        m_optionsItems[JumperOptionsOption::OutputDevice + i].first = m_currentMidiOutputDevicesInfos[i].name.toStdString();
+        m_optionsItems[JumperOptionsOption::OutputDevice + i].second = int(false);
+    }
 }
 
 void JumperComponent::openMidiDevice(const juce::String& deviceIdentifier)
@@ -391,6 +722,18 @@ int JumperComponent::getCurrentFrameRateHz()
 int JumperComponent::getCurrentFrameIntervalMs()
 {
     return 1000 / getCurrentFrameRateHz();
+}
+
+int JumperComponent::getOscPortNumber()
+{
+    return m_oscPortNumber;
+}
+
+void JumperComponent::setOscPortNumber(int portNumber)
+{
+    m_oscPortNumber = portNumber;
+
+    connectToOscSocket();
 }
 
 

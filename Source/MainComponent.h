@@ -37,8 +37,8 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    //========================================================================*
-    std::function<void(int, bool)> onPaletteStyleChange;
+    //==============================================================================
+    std::function<void(int, bool)>& getOnPaletteStyleChangeCallback();
 
 private:
     //==============================================================================

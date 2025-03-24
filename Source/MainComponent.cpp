@@ -78,5 +78,14 @@ void MainComponent::resized()
     m_jumperComponent->setBounds(safeBounds);
 }
 
+std::function<void(int, bool)>& MainComponent::getOnPaletteStyleChangeCallback()
+{
+    if (m_jumperComponent)
+        return m_jumperComponent->onPaletteStyleChange;
+    else
+        return std::function<void(int, bool)>();
+}
+
+
 }
 
