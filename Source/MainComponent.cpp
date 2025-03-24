@@ -83,7 +83,7 @@ std::function<void(int, bool)>& MainComponent::getOnPaletteStyleChangeCallback()
     if (m_jumperComponent)
         return m_jumperComponent->onPaletteStyleChange;
     else
-        return std::function<void(int, bool)>();
+        return onPaletteStyleChange;
 }
 
 

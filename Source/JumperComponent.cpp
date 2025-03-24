@@ -336,13 +336,13 @@ void JumperComponent::resized()
 {
     auto bounds = getLocalBounds();
 
-    auto headerBounds = bounds.removeFromTop(30);
+    auto headerBounds = bounds.removeFromTop(40);
     m_optionsButton->setBounds(headerBounds.removeFromLeft(headerBounds.getHeight()).reduced(1));
     m_aboutButton->setBounds(headerBounds.removeFromRight(headerBounds.getHeight()).reduced(2));
 
     bounds.removeFromTop(1);
 
-    auto valueBounds = bounds.removeFromTop(34);
+    auto valueBounds = bounds.removeFromTop(44);
     m_framerateEditor->setBounds(valueBounds.removeFromLeft(50).reduced(1));
     m_startRunningButton->setBounds(valueBounds.removeFromRight(valueBounds.getHeight()).reduced(1));
     m_timecodeEditor->setBounds(valueBounds.reduced(1));
