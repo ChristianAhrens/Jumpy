@@ -111,7 +111,7 @@ private:
     std::unique_ptr<juce::DrawableButton>               m_optionsButton;
     std::map<int, std::pair<std::string, int>>          m_optionsItems;
 
-    std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_oscPortEdit;
+    std::unique_ptr<juce::AlertWindow>                  m_messageBox;
 
     std::unique_ptr<juce::DrawableButton>               m_aboutButton;
     std::unique_ptr<AboutComponent>                     m_aboutComponent;

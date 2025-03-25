@@ -225,8 +225,6 @@ JumperComponent::JumperComponent()
     // default output visu is normal meterbridge
     m_optionsItems[JumperOptionsOption::OscPort] = std::make_pair("OSC Port", 1);
 
-    m_oscPortEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("OSC port editor");
-
     m_optionsButton = std::make_unique<juce::DrawableButton>("Options", juce::DrawableButton::ButtonStyle::ImageFitted);
     m_optionsButton->setTooltip(juce::JUCEApplication::getInstance()->getApplicationName() + " Options");
     m_optionsButton->onClick = [this] {
@@ -563,36 +561,16 @@ void JumperComponent::handleOptionsLookAndFeelMenuResult(int selectedId)
 
 void JumperComponent::handleOptionsOscPortMenuResult()
 {
-    //juce::AlertWindow messageBox("OSC port", "OSC port to open and listen on for incoming data:", juce::MessageBoxIconType::NoIcon);
-    //messageBox.addTextEditor("OSC port", juce::String(getOscPortNumber()), "OSC port");
-    //messageBox.addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
-    //messageBox.addButton("Ok", 0, juce::KeyPress(juce::KeyPress::returnKey));
-    //messageBox.enterModalState();
-    //messageBox.setVisible(true);
-    //messageBox.toFront(true);
+    m_messageBox = std::make_unique<juce::AlertWindow>("OSC port", "OSC port to open\nand listen on for incoming data:", juce::MessageBoxIconType::NoIcon);
+    m_messageBox->addTextEditor("OSC port", juce::String(getOscPortNumber()));
+    m_messageBox->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+    m_messageBox->addButton("Ok", 1, juce::KeyPress(juce::KeyPress::returnKey));
+    m_messageBox->enterModalState(true, juce::ModalCallbackFunction::create([=](int returnValue) {
+        if (returnValue == 1)
+            setOscPortNumber(m_messageBox->getTextEditorContents("OSC port").getIntValue());
 
-    m_oscPortEdit->setText(juce::String(m_oscPortNumber));
-    m_oscPortEdit->setVisible(true);
-
-    juce::AlertWindow::showAsync(
-        juce::MessageBoxOptions()
-            .withTitle("OSC port")
-            .withMessage("OSC port to open and listen on for incoming data:")
-            .withAssociatedComponent(m_oscPortEdit.get())
-            .withButton("Cancel")
-            .withButton("Ok"),
-        [=](int buttonIndex) {
-            if (buttonIndex == 1)
-            {
-
-            }
-            else if (buttonIndex == 0)
-            {
-                m_oscPortNumber = m_oscPortEdit->getTextValue().getValue();
-            }
-
-            m_oscPortEdit->setVisible(false);
-        });
+        m_messageBox.reset();
+    }));
 }
 
 void JumperComponent::handleOptionsOutputDeviceSelectionMenuResult(int selectedId)
