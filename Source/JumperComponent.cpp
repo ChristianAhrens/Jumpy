@@ -224,6 +224,7 @@ JumperComponent::JumperComponent()
     m_optionsItems[JumperOptionsOption::LookAndFeel_Light] = std::make_pair("Light", 0);
     // default output visu is normal meterbridge
     m_optionsItems[JumperOptionsOption::OscPort] = std::make_pair("OSC Port", 1);
+    m_optionsItems[JumperOptionsOption::FrameRate] = std::make_pair("Framerate", 1);
 
     m_optionsButton = std::make_unique<juce::DrawableButton>("Options", juce::DrawableButton::ButtonStyle::ImageFitted);
     m_optionsButton->setTooltip(juce::JUCEApplication::getInstance()->getApplicationName() + " Options");
@@ -242,6 +243,7 @@ JumperComponent::JumperComponent()
         optionsMenu.addSubMenu("MIDI output device", midiOutputSubMenu);
         optionsMenu.addSeparator();
         optionsMenu.addItem(JumperOptionsOption::OscPort, "OSC port: " + juce::String(m_oscPortNumber));
+        optionsMenu.addItem(JumperOptionsOption::FrameRate, "Framerate: " + FramerateToString(m_frameRate) + "fps");
         optionsMenu.addSeparator();
         optionsMenu.addItem(JumperOptionsOption::ResetConfig, "Reset configuration");
         optionsMenu.showMenuAsync(juce::PopupMenu::Options(), [=](int selectedId) { handleOptionsMenuResult(selectedId); });
@@ -270,13 +272,6 @@ JumperComponent::JumperComponent()
     m_timecodeEditor->onFocusLost = [=]() { if (!parseTimecode()) resetTimecode(); };
     resetTimecode();
     addAndMakeVisible(m_timecodeEditor.get());
-
-    m_framerateEditor = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("fr", 0U, true);
-    m_framerateEditor->setInputFilter(new juce::TextEditor::LengthAndCharacterRestriction(5, "0123456789.,"), true);
-    m_framerateEditor->onReturnKey = [=]() { if (!parseFramerate()) resetFramerate(); };
-    m_framerateEditor->onFocusLost = [=]() { if (!parseFramerate()) resetFramerate(); };
-    resetFramerate();
-    addAndMakeVisible(m_framerateEditor.get());
 
     m_startRunningButton = std::make_unique<juce::DrawableButton>("RunTC", juce::DrawableButton::ButtonStyle::ImageOnButtonBackground);
     m_startRunningButton->setClickingTogglesState(true);
@@ -334,6 +329,9 @@ void JumperComponent::resized()
 {
     auto bounds = getLocalBounds();
 
+    if (bounds.isEmpty() || !m_optionsButton || !m_aboutButton || !m_startRunningButton || !m_timecodeEditor || !m_triggerTCButton)
+        return;
+
     auto headerBounds = bounds.removeFromTop(40);
     m_optionsButton->setBounds(headerBounds.removeFromLeft(headerBounds.getHeight()).reduced(1));
     m_aboutButton->setBounds(headerBounds.removeFromRight(headerBounds.getHeight()).reduced(2));
@@ -341,7 +339,6 @@ void JumperComponent::resized()
     bounds.removeFromTop(1);
 
     auto valueBounds = bounds.removeFromTop(44);
-    m_framerateEditor->setBounds(valueBounds.removeFromLeft(50).reduced(1));
     m_startRunningButton->setBounds(valueBounds.removeFromRight(valueBounds.getHeight()).reduced(1));
     m_timecodeEditor->setBounds(valueBounds.reduced(1));
 
@@ -478,9 +475,7 @@ void JumperComponent::onConfigUpdated()
     if (deviceConfigXml)
     {
         m_frameRate = deviceConfigXml->getIntAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::FRAMERATE));
-        if (m_framerateEditor)
-            m_framerateEditor->setText(juce::String(getCurrentFrameRateHz()));
-
+        
         auto midiDeviceIdentifier = deviceConfigXml->getChildElementAllSubText(JumperConfiguration::getTagName(JumperConfiguration::TagID::MIDIOUTPUT), "");
         if (midiDeviceIdentifier.isNotEmpty())
         {
@@ -488,6 +483,8 @@ void JumperComponent::onConfigUpdated()
                 m_optionsItems[JumperOptionsOption::OutputDevice + i].second = m_optionsItems[JumperOptionsOption::OutputDevice + i].first == midiDeviceIdentifier;
             openMidiDevice(midiDeviceIdentifier);
         }
+        else
+            m_midiOutput.reset();
     }
 
     auto customTriggersXml = m_config->getConfigState(JumperConfiguration::getTagName(JumperConfiguration::TagID::CUSTOMTRIGGERS));
@@ -521,6 +518,8 @@ void JumperComponent::handleOptionsMenuResult(int selectedId)
         handleOptionsLookAndFeelMenuResult(selectedId);
     else if (JumperOptionsOption::OscPort == selectedId)
         handleOptionsOscPortMenuResult();
+    else if (JumperOptionsOption::FrameRate == selectedId)
+        handleOptionsFramerateMenuResult();
     else if (JumperOptionsOption::OutputDevice <= selectedId)
         handleOptionsOutputDeviceSelectionMenuResult(selectedId);
     else
@@ -571,6 +570,26 @@ void JumperComponent::handleOptionsOscPortMenuResult()
 
         m_messageBox.reset();
     }));
+}
+
+void JumperComponent::handleOptionsFramerateMenuResult()
+{
+    m_messageBox = std::make_unique<juce::AlertWindow>("Framerate", "Framerate to use\nfor timecode generation:", juce::MessageBoxIconType::NoIcon);
+    m_messageBox->addComboBox("Framerate", { "24fps", "25fps", "29.97fps", "30fps" });
+    m_messageBox->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey));
+    m_messageBox->addButton("Ok", 1, juce::KeyPress(juce::KeyPress::returnKey));
+    m_messageBox->enterModalState(true, juce::ModalCallbackFunction::create([=](int returnValue) {
+        if (returnValue == 1)
+        {
+            if (auto cb = m_messageBox->getComboBoxComponent("Framerate"))
+            {
+                if (!FramerateFromString(cb->getItemText(cb->getSelectedItemIndex()).removeCharacters("fps")))
+                    juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Invalid framerate specified");
+            }
+        }
+
+        m_messageBox.reset();
+        }));
 }
 
 void JumperComponent::handleOptionsOutputDeviceSelectionMenuResult(int selectedId)
@@ -650,12 +669,9 @@ void JumperComponent::resetTimecode()
     m_ts.clear();
 }
 
-bool JumperComponent::parseFramerate()
+bool JumperComponent::FramerateFromString(const juce::String& framerateStr)
 {
-    if (!m_framerateEditor)
-        return false;
-
-    auto frameRate = m_framerateEditor->getText().getDoubleValue();
+    auto frameRate = framerateStr.getDoubleValue();
     if (frameRate == 24)
         m_frameRate = 0;
     else if (frameRate == 25)
@@ -668,20 +684,29 @@ bool JumperComponent::parseFramerate()
         return false;
 
     if (m_config)
-        m_config->triggerConfigurationDump(false);
+        m_config->triggerConfigurationDump();
 
     return true;
 }
 
-void JumperComponent::resetFramerate()
+juce::String JumperComponent::FramerateToString(int framerateIdent)
 {
-    if (m_framerateEditor)
-        m_framerateEditor->setText("25");
-
-    m_frameRate = 1;
+    switch (framerateIdent)
+    {
+    case 0:
+        return "24";
+    case 1:
+        return "25";
+    case 2:
+        return "29.97";
+    case 3:
+        return "30";
+    default:
+        return "";
+    }
 }
 
-int JumperComponent::getCurrentFrameRateHz()
+double JumperComponent::getCurrentFrameRateHz()
 {
     switch (m_frameRate)
     {
@@ -690,7 +715,7 @@ int JumperComponent::getCurrentFrameRateHz()
     case 1:
         return 25;
     case 2:
-        return 30;
+        return 29.97;
     case 3:
     default:
         return 30;
@@ -699,7 +724,7 @@ int JumperComponent::getCurrentFrameRateHz()
 
 int JumperComponent::getCurrentFrameIntervalMs()
 {
-    return 1000 / getCurrentFrameRateHz();
+    return int(1000.0 / getCurrentFrameRateHz());
 }
 
 int JumperComponent::getOscPortNumber()

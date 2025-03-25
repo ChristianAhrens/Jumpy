@@ -50,6 +50,7 @@ public:
         LookAndFeel_Light,
         LookAndFeel_Last = LookAndFeel_Light,
         OscPort,
+        FrameRate,
         OutputDevice,
     };
 
@@ -88,6 +89,7 @@ private:
     void handleOptionsMenuResult(int selectedId);
     void handleOptionsLookAndFeelMenuResult(int selectedId);
     void handleOptionsOscPortMenuResult();
+    void handleOptionsFramerateMenuResult();
     void handleOptionsOutputDeviceSelectionMenuResult(int selectedId);
 
     //==============================================================================
@@ -98,11 +100,11 @@ private:
 
     bool parseTimecode();
     void resetTimecode();
-    bool parseFramerate();
-    void resetFramerate();
+    bool FramerateFromString(const juce::String& framerateStr);
+    juce::String FramerateToString(int framerateIdent);
 
     int getCurrentFrameIntervalMs();
-    int getCurrentFrameRateHz();
+    double getCurrentFrameRateHz();
 
     int getOscPortNumber();
     void setOscPortNumber(int portNumber);
@@ -117,7 +119,6 @@ private:
     std::unique_ptr<AboutComponent>                     m_aboutComponent;
 
     std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_timecodeEditor;
-    std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_framerateEditor;
     std::unique_ptr<juce::DrawableButton>               m_startRunningButton;
     std::unique_ptr<juce::TextButton>                   m_triggerTCButton;
 
