@@ -109,6 +109,8 @@ private:
     int getOscPortNumber();
     void setOscPortNumber(int portNumber);
 
+    void ResetCustomTriggers();
+
     //==============================================================================
     std::unique_ptr<juce::DrawableButton>               m_optionsButton;
     std::map<int, std::pair<std::string, int>>          m_optionsItems;

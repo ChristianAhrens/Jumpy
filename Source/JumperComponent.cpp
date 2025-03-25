@@ -82,62 +82,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutComponent)
 };
 
-class PortEditComponent : public juce::Component
-{
-public:
-    PortEditComponent(int portNumber)
-        : PortEditComponent()
-    {
-        setPortValue(portNumber);
-    }
-    PortEditComponent()
-        : juce::Component()
-    {
-        m_portLabel = std::make_unique<juce::Label>("Port Label", "OSC port:");
-        m_portLabel->setJustificationType(juce::Justification::centredLeft);
-        m_portLabel->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)));
-        addAndMakeVisible(m_portLabel.get());
-
-        m_portEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>("Port Edit");
-        m_portEdit->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)));
-        addAndMakeVisible(m_portEdit.get());
-    }
-
-    ~PortEditComponent() override
-    {
-    }
-
-    //========================================================================*
-    //void paint(juce::Graphics& g) override
-    //{
-    //    g.fillAll(getLookAndFeel().findColour(juce::DrawableButton::backgroundColourId));
-    //
-    //    juce::Component::paint(g);
-    //}
-
-    void resized() override
-    {
-        auto bounds = getLocalBounds();
-        m_portLabel->setBounds(bounds.removeFromTop(bounds.getHeight() /2).reduced(1));
-        m_portEdit->setBounds(bounds.reduced(1));
-    }
-
-    int getPortValue()
-    {
-        return m_portEdit->getTextValue().getValue();
-    }
-    void setPortValue(int portValue)
-    {
-        m_portEdit->getTextValue().setValue(portValue);
-    }
-
-private:
-    std::unique_ptr<juce::Label>                        m_portLabel;
-    std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_portEdit;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PortEditComponent)
-};
-
 class CustomAboutItem : public juce::PopupMenu::CustomComponent
 {
 public:
@@ -298,14 +242,7 @@ JumperComponent::JumperComponent()
         m_customTriggersGrid.templateColumns.add(juce::Grid::TrackInfo(juce::Grid::Fr(1)));
     for (int i = 0; i < sc_customTriggersGrid_RowCount; i++)
         m_customTriggersGrid.templateRows.add(juce::Grid::TrackInfo(juce::Grid::Fr(1)));
-    for (int i = 0; i < sc_customTriggersGrid_RowCount * sc_customTriggersGrid_ColCount; i++)
-    {
-        m_customTriggers[i] = std::make_unique<CustomTriggerButton>(juce::String("CT") + juce::String(i));
-        m_customTriggers[i]->onTriggerClicked = [=](const TimeStamp& ts) { setAndSendTimeCode(ts); };
-        m_customTriggers[i]->onDetailsChanged = [=](const CustomTriggerButton::TriggerDetails&) { if (m_config) m_config->triggerConfigurationDump(false); };
-        addAndMakeVisible(m_customTriggers[i].get());
-        m_customTriggersGrid.items.add(m_customTriggers[i].get());
-    }
+    ResetCustomTriggers();
 
     updateAvailableDevices();
 
@@ -490,6 +427,8 @@ void JumperComponent::onConfigUpdated()
     auto customTriggersXml = m_config->getConfigState(JumperConfiguration::getTagName(JumperConfiguration::TagID::CUSTOMTRIGGERS));
     if (customTriggersXml)
     {
+        if (nullptr == customTriggersXml->getChildByName(JumperConfiguration::getTagName(JumperConfiguration::TagID::TRIGGERDETAILS)))
+            ResetCustomTriggers();
         for (auto* elm : customTriggersXml->getChildWithTagNameIterator(JumperConfiguration::getTagName(JumperConfiguration::TagID::TRIGGERDETAILS)))
         {
             if (nullptr != elm)
@@ -500,6 +439,8 @@ void JumperComponent::onConfigUpdated()
             }
         }
     }
+    else
+        ResetCustomTriggers();
 }
 
 
@@ -513,6 +454,8 @@ void JumperComponent::handleOptionsMenuResult(int selectedId)
     {
         if (m_config)
             m_config->ResetToDefault();
+        resized();
+        lookAndFeelChanged();
     }
     else if (JumperOptionsOption::LookAndFeel_First <= selectedId && JumperOptionsOption::LookAndFeel_Last >= selectedId)
         handleOptionsLookAndFeelMenuResult(selectedId);
@@ -737,6 +680,20 @@ void JumperComponent::setOscPortNumber(int portNumber)
     m_oscPortNumber = portNumber;
 
     connectToOscSocket();
+}
+
+void JumperComponent::ResetCustomTriggers()
+{
+    m_customTriggersGrid.items.clear();
+
+    for (int i = 0; i < sc_customTriggersGrid_RowCount * sc_customTriggersGrid_ColCount; i++)
+    {
+        m_customTriggers[i] = std::make_unique<CustomTriggerButton>(juce::String("CT") + juce::String(i));
+        m_customTriggers[i]->onTriggerClicked = [=](const TimeStamp& ts) { setAndSendTimeCode(ts); };
+        m_customTriggers[i]->onDetailsChanged = [=](const CustomTriggerButton::TriggerDetails&) { if (m_config) m_config->triggerConfigurationDump(false); };
+        addAndMakeVisible(m_customTriggers[i].get());
+        m_customTriggersGrid.items.add(m_customTriggers[i].get());
+    }
 }
 
 
