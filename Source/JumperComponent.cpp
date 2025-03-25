@@ -386,6 +386,7 @@ void JumperComponent::performConfigurationDump()
         {
             auto deviceConfigXml = std::make_unique<juce::XmlElement>(JumperConfiguration::getTagName(JumperConfiguration::TagID::DEVCONFIG));
             deviceConfigXml->setAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::FRAMERATE), juce::String(m_frameRate));
+            deviceConfigXml->setAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::OSCPORT), juce::String(m_oscPortNumber));
             auto midiOutputXml = std::make_unique<juce::XmlElement>(JumperConfiguration::getTagName(JumperConfiguration::TagID::MIDIOUTPUT));
             if (m_midiOutput) midiOutputXml->addTextElement(m_midiOutput->getIdentifier());
             deviceConfigXml->addChildElement(midiOutputXml.release());
@@ -412,6 +413,8 @@ void JumperComponent::onConfigUpdated()
     if (deviceConfigXml)
     {
         m_frameRate = deviceConfigXml->getIntAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::FRAMERATE));
+
+        m_oscPortNumber = deviceConfigXml->getIntAttribute(JumperConfiguration::getAttributeName(JumperConfiguration::AttributeID::OSCPORT));
         
         auto midiDeviceIdentifier = deviceConfigXml->getChildElementAllSubText(JumperConfiguration::getTagName(JumperConfiguration::TagID::MIDIOUTPUT), "");
         if (midiDeviceIdentifier.isNotEmpty())
@@ -509,7 +512,12 @@ void JumperComponent::handleOptionsOscPortMenuResult()
     m_messageBox->addButton("Ok", 1, juce::KeyPress(juce::KeyPress::returnKey));
     m_messageBox->enterModalState(true, juce::ModalCallbackFunction::create([=](int returnValue) {
         if (returnValue == 1)
+        {
             setOscPortNumber(m_messageBox->getTextEditorContents("OSC port").getIntValue());
+
+            if (m_config)
+                m_config->triggerConfigurationDump();
+        }
 
         m_messageBox.reset();
     }));
@@ -528,6 +536,8 @@ void JumperComponent::handleOptionsFramerateMenuResult()
             {
                 if (!FramerateFromString(cb->getItemText(cb->getSelectedItemIndex()).removeCharacters("fps")))
                     juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Error", "Invalid framerate specified");
+                else if (m_config)
+                    m_config->triggerConfigurationDump();
             }
         }
 
@@ -625,9 +635,6 @@ bool JumperComponent::FramerateFromString(const juce::String& framerateStr)
         m_frameRate = 3;
     else
         return false;
-
-    if (m_config)
-        m_config->triggerConfigurationDump();
 
     return true;
 }

@@ -58,7 +58,8 @@ public:
     enum AttributeID
     {
         IDENT,
-        FRAMERATE
+        FRAMERATE,
+        OSCPORT
     };
     static juce::String getAttributeName(AttributeID ID)
     {
@@ -68,6 +69,8 @@ public:
             return "IDENT";
         case FRAMERATE:
             return "FRAMERATE";
+        case OSCPORT:
+            return "OSCPORT";
         default:
             return "-";
         }
