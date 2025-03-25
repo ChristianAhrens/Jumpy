@@ -122,7 +122,7 @@ private:
 
     std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_timecodeEditor;
     std::unique_ptr<juce::DrawableButton>               m_startRunningButton;
-    std::unique_ptr<juce::TextButton>                   m_triggerTCButton;
+    std::unique_ptr<juce::DrawableButton>               m_triggerCurrentTCButton;
 
     std::map<int, std::unique_ptr<CustomTriggerButton>> m_customTriggers;
     juce::Grid                                          m_customTriggersGrid;

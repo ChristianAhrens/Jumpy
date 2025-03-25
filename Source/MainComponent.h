@@ -45,6 +45,7 @@ public:
 private:
     //==============================================================================
     std::unique_ptr<JumperComponent>    m_jumperComponent;
+    std::unique_ptr<TooltipWindow>      m_toolTipWindowInstance;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

@@ -30,6 +30,9 @@ namespace Jumper
 
 MainComponent::MainComponent()
 {
+    // a single instance of tooltip window is required and used by JUCE everywhere a tooltip is required.
+    m_toolTipWindowInstance = std::make_unique<TooltipWindow>();
+
     m_jumperComponent = std::make_unique<JumperComponent>();
     addAndMakeVisible(m_jumperComponent.get());
     

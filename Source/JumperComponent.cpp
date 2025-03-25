@@ -199,7 +199,7 @@ JumperComponent::JumperComponent()
 
     m_aboutComponent = std::make_unique<AboutComponent>(BinaryData::JumperRect_png, BinaryData::JumperRect_pngSize);
     m_aboutButton = std::make_unique<juce::DrawableButton>("About", juce::DrawableButton::ButtonStyle::ImageFitted);
-    m_aboutButton->setTooltip(juce::String("About") + juce::JUCEApplication::getInstance()->getApplicationName());
+    m_aboutButton->setTooltip(juce::String("About ") + juce::JUCEApplication::getInstance()->getApplicationName());
     m_aboutButton->onClick = [this] {
         juce::PopupMenu aboutMenu;
         aboutMenu.addCustomItem(1, std::make_unique<CustomAboutItem>(m_aboutComponent.get(), juce::Rectangle<int>(250, 250)), nullptr, juce::String("Info about") + juce::JUCEApplication::getInstance()->getApplicationName());
@@ -218,6 +218,7 @@ JumperComponent::JumperComponent()
     addAndMakeVisible(m_timecodeEditor.get());
 
     m_startRunningButton = std::make_unique<juce::DrawableButton>("RunTC", juce::DrawableButton::ButtonStyle::ImageOnButtonBackground);
+    m_startRunningButton->setTooltip("Start running timecode.");
     m_startRunningButton->setClickingTogglesState(true);
     m_startRunningButton->onClick = [=]() {
         if (m_startRunningButton && m_startRunningButton->getToggleState())
@@ -232,9 +233,10 @@ JumperComponent::JumperComponent()
     };
     addAndMakeVisible(m_startRunningButton.get());
 
-    m_triggerTCButton = std::make_unique<juce::TextButton>("Trigger current TC", "SendMessage");
-    m_triggerTCButton->onClick = [=]() { sendMessage(); };
-    addAndMakeVisible(m_triggerTCButton.get());
+    m_triggerCurrentTCButton = std::make_unique<juce::DrawableButton>("Trigger current TC", juce::DrawableButton::ButtonStyle::ImageOnButtonBackground);
+    m_triggerCurrentTCButton->setTooltip("Trigger current timecode once.");
+    m_triggerCurrentTCButton->onClick = [=]() { sendMessage(); };
+    addAndMakeVisible(m_triggerCurrentTCButton.get());
 
     m_customTriggersGrid.rowGap.pixels = sc_customTriggersGrid_NodeGap;
     m_customTriggersGrid.columnGap.pixels = sc_customTriggersGrid_NodeGap;
@@ -266,7 +268,7 @@ void JumperComponent::resized()
 {
     auto bounds = getLocalBounds();
 
-    if (bounds.isEmpty() || !m_optionsButton || !m_aboutButton || !m_startRunningButton || !m_timecodeEditor || !m_triggerTCButton)
+    if (bounds.isEmpty() || !m_optionsButton || !m_aboutButton || !m_startRunningButton || !m_timecodeEditor || !m_triggerCurrentTCButton)
         return;
 
     auto headerBounds = bounds.removeFromTop(40);
@@ -276,12 +278,9 @@ void JumperComponent::resized()
     bounds.removeFromTop(1);
 
     auto valueBounds = bounds.removeFromTop(44);
+    m_triggerCurrentTCButton->setBounds(valueBounds.removeFromRight(valueBounds.getHeight()).reduced(1));
     m_startRunningButton->setBounds(valueBounds.removeFromRight(valueBounds.getHeight()).reduced(1));
     m_timecodeEditor->setBounds(valueBounds.reduced(1));
-
-    bounds.removeFromTop(2);
-
-    m_triggerTCButton->setBounds(bounds.removeFromTop(30).reduced(1));
 
     bounds.removeFromTop(6);
 
@@ -326,6 +325,10 @@ void JumperComponent::lookAndFeelChanged()
     auto startRunningButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::play_arrow24px_svg).get());
     startRunningButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
     m_startRunningButton->setImages(startRunningButtonDrawable.get());
+
+    auto triggerCurrentTCButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::Jumper_svg).get());
+    triggerCurrentTCButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
+    m_triggerCurrentTCButton->setImages(triggerCurrentTCButtonDrawable.get());
 }
 
 void JumperComponent::setAndSendTimeCode(TimeStamp ts)

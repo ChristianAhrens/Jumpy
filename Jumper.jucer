@@ -32,6 +32,7 @@
       <GROUP id="{5418C8BA-AFDC-83EF-A716-D3FB9CE9A772}" name="Images">
         <FILE id="g0EK1m" name="add-24px.svg" compile="0" resource="1" file="submodules/JUCE-AppBasics/Resources/Images/add-24px.svg"/>
         <FILE id="Ge4sMI" name="Jumper.png" compile="0" resource="1" file="Resources/Images/Jumper.png"/>
+        <FILE id="SXDX3q" name="Jumper.svg" compile="0" resource="1" file="Resources/Images/Jumper.svg"/>
         <FILE id="Gk0x85" name="JumperCanvas.png" compile="0" resource="1"
               file="Resources/Images/JumperCanvas.png"/>
         <FILE id="AIsoi6" name="JumperRect.png" compile="0" resource="1" file="Resources/Images/JumperRect.png"/>
