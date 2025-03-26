@@ -209,7 +209,7 @@ JumperComponent::JumperComponent()
         optionsMenu.addItem(JumperOptionsOption::FrameRate, "Framerate: " + FramerateToString(m_frameRate) + "fps");
         optionsMenu.addSeparator();
         optionsMenu.addItem(JumperOptionsOption::ResetConfig, "Reset configuration");
-        optionsMenu.showMenuAsync(juce::PopupMenu::Options(), [=](int selectedId) { handleOptionsMenuResult(selectedId); });
+        optionsMenu.showMenuAsync(juce::PopupMenu::Options().withStandardItemHeight(32), [=](int selectedId) { handleOptionsMenuResult(selectedId); });
     };
     m_optionsButton->setAlwaysOnTop(true);
     m_optionsButton->setColour(juce::DrawableButton::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
