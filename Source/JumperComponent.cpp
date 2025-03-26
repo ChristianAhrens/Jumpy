@@ -46,6 +46,14 @@ public:
         m_appRepoLink->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)), false /* do not resize */);
         m_appRepoLink->setJustificationType(juce::Justification::centredTop);
         addAndMakeVisible(m_appRepoLink.get());
+        
+#if JUCE_IOS
+        m_iOSMIDISetupLink = std::make_unique<juce::HyperlinkButton>("MIDI connection to macOS", URL("https://github.com/ChristianAhrens/Jumper/blob/main/README.md#midi-network-session-setup---ios-to-macos"));
+        https://github.com/ChristianAhrens/Mema/blob/main/README.md#mobilerecordingusecase
+        m_iOSMIDISetupLink->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)), false /* do not resize */);
+        m_iOSMIDISetupLink->setJustificationType(juce::Justification::centredTop);
+        addAndMakeVisible(m_iOSMIDISetupLink.get());
+#endif
     }
 
     ~AboutComponent() override
@@ -67,17 +75,28 @@ public:
         bounds.reduce(margin, margin);
         auto iconBounds = bounds.removeFromTop(bounds.getHeight() / 2);
         auto infoBounds = bounds.removeFromTop(bounds.getHeight() / 2);
+#if JUCE_IOS
+        auto repoLinkBounds = bounds.removeFromTop(18);
+        auto& howToMIDIiOS = bounds;
+#else
         auto& repoLinkBounds = bounds;
+#endif
 
         m_appIcon->setBounds(iconBounds);
         m_appInfoLabel->setBounds(infoBounds);
         m_appRepoLink->setBounds(repoLinkBounds);
+#if JUCE_IOS
+        m_iOSMIDISetupLink->setBounds(howToMIDIiOS);
+#endif
     }
 
 private:
     std::unique_ptr<juce::DrawableButton>   m_appIcon;
     std::unique_ptr<juce::Label>            m_appInfoLabel;
     std::unique_ptr<juce::HyperlinkButton>  m_appRepoLink;
+#if JUCE_IOS
+    std::unique_ptr<juce::HyperlinkButton>  m_iOSMIDISetupLink;
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutComponent)
 };
