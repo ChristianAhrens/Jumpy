@@ -30,9 +30,9 @@ git submodule update --init --recursive
 cd Resources/Deployment/Linux
 
 # start the buildscript (make -j 2 instead of default 8 to not overload the poor raspi)
-chmod +x build_Jumper.sh
-./build_Jumper.sh 2
+chmod +x build_Jumpy.sh
+./build_Jumpy.sh 2
 
 # -> after a successful build, one could e.g. use the following as contents for .xsession to have the app start in kind of a kiosk mode. VNC of raspbian will still work in this scenario btw
 ##!/bin/sh
-#exec Documents/Development/GitHub/Jumper/Builds/LinuxMakefile/build/Jumper
+#exec Documents/Development/GitHub/Jumpy/Builds/LinuxMakefile/build/Jumpy

@@ -1,9 +1,9 @@
-#define MyAppName "Jumper"
-#define MyAppExeName "Jumper.exe"
-#define MyAppExePath "..\..\..\Builds\VisualStudio2022\x64\Release\App\Jumper.exe"
-#define MyAppVersion GetVersionNumbersString("..\..\..\Builds\VisualStudio2022\x64\Release\App\Jumper.exe")
+#define MyAppName "Jumpy"
+#define MyAppExeName "Jumpy.exe"
+#define MyAppExePath "..\..\..\Builds\VisualStudio2022\x64\Release\App\Jumpy.exe"
+#define MyAppVersion GetVersionNumbersString("..\..\..\Builds\VisualStudio2022\x64\Release\App\Jumpy.exe")
 #define MyAppPublisher "Christian Ahrens"
-#define MyAppURL "https://www.github.com/ChristianAhrens/Jumper"
+#define MyAppURL "https://www.github.com/ChristianAhrens/Jumpy"
 
 [Setup]
 AppId={{0923C12E-915B-4E77-92FB-187CB97E73A9}

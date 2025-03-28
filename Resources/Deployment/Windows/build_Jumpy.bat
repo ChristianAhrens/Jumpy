@@ -18,9 +18,9 @@ echo Building Projucer binary
 echo.
 
 echo Exporting Projucer project
-"%PROJUCERVSDIR%\x64\Release\App\Projucer.exe" --resave %WORKSPACE%\Jumper.jucer
+"%PROJUCERVSDIR%\x64\Release\App\Projucer.exe" --resave %WORKSPACE%\Jumpy.jucer
 echo.
 
 echo Build release
-"%VSDIR%\devenv.com" %WORKSPACE%\Builds\VisualStudio2022\Jumper.sln /build Release
+"%VSDIR%\devenv.com" %WORKSPACE%\Builds\VisualStudio2022\Jumpy.sln /build Release
 echo.

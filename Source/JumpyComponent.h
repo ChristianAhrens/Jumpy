@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
+ * This file is part of Jumpy <https://github.com/ChristianAhrens/Jumpy>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -22,10 +22,10 @@
 
 #include <FixedFontTextEditor.h>
 
-#include "JumperConfiguration.h"
+#include "JumpyConfiguration.h"
 #include "CustomTriggerButton.h"
 
-namespace Jumper
+namespace Jumpy
 {
 
 /**
@@ -33,15 +33,15 @@ namespace Jumper
  */
 class AboutComponent;
 
-class JumperComponent :   
+class JumpyComponent :   
     public juce::Component, 
     public juce::Timer, 
     public juce::OSCReceiver::Listener<juce::OSCReceiver::MessageLoopCallback>,
-    public JumperConfiguration::Dumper,
-    public JumperConfiguration::Watcher
+    public JumpyConfiguration::Dumper,
+    public JumpyConfiguration::Watcher
 {
 public:
-    enum JumperOptionsOption
+    enum JumpyOptionsOption
     {
         ResetConfig = 1,
         LookAndFeel_First,
@@ -55,8 +55,8 @@ public:
     };
 
 public:
-    JumperComponent();
-    ~JumperComponent() override;
+    JumpyComponent();
+    ~JumpyComponent() override;
 
     //==============================================================================
     void paint(juce::Graphics&) override;
@@ -136,7 +136,7 @@ private:
 
     std::unique_ptr<juce::OSCReceiver>                  m_oscServer;
 
-    std::unique_ptr<JumperConfiguration>                m_config;
+    std::unique_ptr<JumpyConfiguration>                m_config;
 
     TimeStamp m_ts;
     int m_frameRate = 1; // 24fps=00, 25fps=01, 29,97fps=10, 30fps=11
@@ -148,7 +148,7 @@ private:
     static constexpr int sc_millisInMin = (1000 * 60);
     static constexpr int sc_millisInHour = (1000 * 60 * 60);
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JumperComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JumpyComponent)
 };
 
 };

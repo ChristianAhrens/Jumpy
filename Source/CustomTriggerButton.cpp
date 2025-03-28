@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
+ * This file is part of Jumpy <https://github.com/ChristianAhrens/Jumpy>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -21,7 +21,7 @@
 #include <FixedFontTextEditor.h>
 
 
-namespace Jumper
+namespace Jumpy
 {
 
 CustomTriggerButton::CustomTriggerButton(const juce::String& buttonName)

@@ -10,11 +10,11 @@ echo WORKSPACE = %WORKSPACE%
 echo.
 
 echo Build project
-CALL build_Jumper.bat
+CALL build_Jumpy.bat
 
 echo Build installer
-"%INNOSETUPDIR%\ISCC.exe" create_Jumper-installer.iss
+"%INNOSETUPDIR%\ISCC.exe" create_Jumpy-installer.iss
 echo.
 
 echo Move setup executable to workspace root
-move Output\JumperSetup*.exe %WORKSPACE%
+move Output\JumpySetup*.exe %WORKSPACE%

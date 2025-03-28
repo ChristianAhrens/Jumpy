@@ -3,14 +3,14 @@ cd ../../../
 
 # set convenience variables
 AppStoreUser=$1 # appleid to use for appstore access
-ProjectName=Jumper
-ProjectSpecialName=Jumper
+ProjectName=Jumpy
+ProjectSpecialName=Jumpy
 JUCEDir=submodules/JUCE
 ProjucerPath="$JUCEDir"/extras/Projucer/Builds/MacOSX
 ProjucerBinPath="$ProjucerPath"/build/Release/Projucer.app/Contents/MacOS/Projucer
 ProjectDir="$ProjectName"/Builds/iOS
 JucerProjectPath="$ProjectName"/"$ProjectName".jucer
-XCodeProjectPath="$ProjectDir"/Jumper.xcodeproj
+XCodeProjectPath="$ProjectDir"/Jumpy.xcodeproj
 XCodeProjectScheme="$ProjectSpecialName"" - App"
 XCodeBuildPath="$ProjectDir"/build
 XCodeEntitlementsPath=Resources/Deployment/iOS/App.entitlements

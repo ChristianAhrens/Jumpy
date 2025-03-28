@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
+ * This file is part of Jumpy <https://github.com/ChristianAhrens/Jumpy>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -73,7 +73,7 @@ public:
             ignoreUnused(commandLine);
 
             setUsingNativeTitleBar(true);
-            auto mainComponent = std::make_unique<Jumper::MainComponent>();
+            auto mainComponent = std::make_unique<Jumpy::MainComponent>();
             mainComponent->getOnPaletteStyleChangeCallback() = [=](int paletteStyle, bool followLocalStyle) {
                 m_followLocalStyle = followLocalStyle;
                 if (followLocalStyle)

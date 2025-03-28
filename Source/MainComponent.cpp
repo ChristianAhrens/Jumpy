@@ -1,6 +1,6 @@
 /* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of MTCtrigger <https://github.com/ChristianAhrens/Jumper>
+ * This file is part of Jumpy <https://github.com/ChristianAhrens/Jumpy>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -18,14 +18,14 @@
 
 #include "MainComponent.h"
 
-#include "JumperComponent.h"
+#include "JumpyComponent.h"
 
 #include <CustomLookAndFeel.h>
 #include <WebUpdateDetector.h>
 #include <iOS_utils.h>
 
 
-namespace Jumper
+namespace Jumpy
 {
 
 MainComponent::MainComponent()
@@ -33,8 +33,8 @@ MainComponent::MainComponent()
     // a single instance of tooltip window is required and used by JUCE everywhere a tooltip is required.
     m_toolTipWindowInstance = std::make_unique<TooltipWindow>();
 
-    m_jumperComponent = std::make_unique<JumperComponent>();
-    addAndMakeVisible(m_jumperComponent.get());
+    m_JumpyComponent = std::make_unique<JumpyComponent>();
+    addAndMakeVisible(m_JumpyComponent.get());
     
     setSize (300, 600);
 
@@ -50,8 +50,8 @@ MainComponent::MainComponent()
 #else
     auto updater = JUCEAppBasics::WebUpdateDetector::getInstance();
     updater->SetReferenceVersion(ProjectInfo::versionString);
-    updater->SetDownloadUpdateWebAddress("https://github.com/christianahrens/Jumper/releases/latest");
-    updater->CheckForNewVersion(true, "https://raw.githubusercontent.com/ChristianAhrens/Jumper/refs/heads/main/");
+    updater->SetDownloadUpdateWebAddress("https://github.com/christianahrens/Jumpy/releases/latest");
+    updater->CheckForNewVersion(true, "https://raw.githubusercontent.com/ChristianAhrens/Jumpy/refs/heads/main/");
 #endif
 }
 
@@ -78,13 +78,13 @@ void MainComponent::resized()
     safeBounds.removeFromLeft(safety._left);
     safeBounds.removeFromRight(safety._right);
     
-    m_jumperComponent->setBounds(safeBounds);
+    m_JumpyComponent->setBounds(safeBounds);
 }
 
 std::function<void(int, bool)>& MainComponent::getOnPaletteStyleChangeCallback()
 {
-    if (m_jumperComponent)
-        return m_jumperComponent->onPaletteStyleChange;
+    if (m_JumpyComponent)
+        return m_JumpyComponent->onPaletteStyleChange;
     else
         return onPaletteStyleChange;
 }

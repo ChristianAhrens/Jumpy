@@ -8,12 +8,12 @@ echo "Using certificate $CodeSignCertName for codesigning."
 
 # set convenience variables
 AppBundlePath=Builds/MacOSX/build/Release
-DmgTargetPath=Jumper.dmg
+DmgTargetPath=Jumpy.dmg
 
 # build the project and create dmg
 cd Resources/Deployment/macOS
-./build_Jumper.sh
-./create_Jumper-diskimage.sh
+./build_Jumpy.sh
+./create_Jumpy-diskimage.sh
 cd ../../../
 
 # codesign the disk image

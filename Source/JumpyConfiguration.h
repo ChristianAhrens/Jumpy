@@ -1,6 +1,6 @@
-/* Copyright (c) 2024, Christian Ahrens
+/* Copyright (c) 2025, Christian Ahrens
  *
- * This file is part of Mema <https://github.com/ChristianAhrens/Mema>
+ * This file is part of Jumpy <https://github.com/ChristianAhrens/Jumpy>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -22,12 +22,12 @@
 
 #include <AppConfigurationBase.h>
 
-#define JUMPER_CONFIG_VERSION "1.0.0"
+#define JUMPY_CONFIG_VERSION "1.0.0"
 
-namespace Jumper
+namespace Jumpy
 {
 
-class JumperConfiguration : public JUCEAppBasics::AppConfigurationBase
+class JumpyConfiguration : public JUCEAppBasics::AppConfigurationBase
 {
 
 public:
@@ -77,8 +77,8 @@ public:
     };
 
 public:
-    explicit JumperConfiguration(const File &file);
-    ~JumperConfiguration() override;
+    explicit JumpyConfiguration(const File &file);
+    ~JumpyConfiguration() override;
 
     bool isValid() override;
     static bool isValid(const std::unique_ptr<juce::XmlElement>& xmlConfig);
@@ -90,7 +90,7 @@ protected:
 
 private:
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(JumperConfiguration)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(JumpyConfiguration)
 };
 
-} // namespace Jumper
+} // namespace Jumpy

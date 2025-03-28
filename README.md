@@ -1,6 +1,6 @@
-![Showreel.001.png](Resources/Documentation/Showreel/Showreel.001.png "Jumper Headline Icons")
+![Showreel.001.png](Resources/Documentation/Showreel/Showreel.001.png "Jumpy Headline Icons")
 
-See [LATEST RELEASE](https://github.com/ChristianAhrens/Jumper/releases/latest) for available binary packages
+See [LATEST RELEASE](https://github.com/ChristianAhrens/Jumpy/releases/latest) for available binary packages
 
 
 <a name="toc" />
@@ -8,9 +8,9 @@ See [LATEST RELEASE](https://github.com/ChristianAhrens/Jumper/releases/latest) 
 ## Table of contents
 
 * [Introduction](#introduction)
-* [Jumper - app functionality](#jumper---app-functionality)
-  * [Main Jumper UI](#main-jumper-ui)
-  * [Jumper options menu](#jumper-options-menu)
+* [Jumpy - app functionality](#Jumpy---app-functionality)
+  * [Main Jumpy UI](#main-Jumpy-ui)
+  * [Jumpy options menu](#Jumpy-options-menu)
   * [Custom trigger configuration](#custom-trigger-configuration)
 * [MIDI network session setup - iOS to macOS](#midi-network-session-setup---ios-to-macos)
 
@@ -19,12 +19,12 @@ See [LATEST RELEASE](https://github.com/ChristianAhrens/Jumper/releases/latest) 
 
 ## Overview
 
-Jumper is a small test utility to send MIDI TimeCode messages to a selected MIDI output device.
+Jumpy is a small test utility to send MIDI TimeCode messages to a selected MIDI output device.
 Features:
 - Manual timecode and framerate selection
 - Triggering MTC (SysEx) message with current timecode value
 - Play/pause for continuous timecode value sending (generated through async system timer - no high accuracy!)
-- Triggering MTC (SysEx) message via OSC ("/Jumper/TS hh:mm:ss:ff")
+- Triggering MTC (SysEx) message via OSC ("/Jumpy/TS hh:mm:ss:ff")
 - 3x4 custom timecode trigger buttons, incl. custom name and color on UI
 - OSC trigger button control via custom string
 
@@ -32,21 +32,21 @@ Its sourcecode and prebuilt binaries are made publicly available to enable inter
 
 Use what is provided here at your own risk!
 
-<a name="Jumper" />
+<a name="Jumpy" />
 
-## Jumper - app functionality
+## Jumpy - app functionality
 
-### Main Jumper UI
+### Main Jumpy UI
 
-![Showreel.002.png](Resources/Documentation/Showreel/Showreel.002.png "Jumper main")
+![Showreel.002.png](Resources/Documentation/Showreel/Showreel.002.png "Jumpy main")
 
-### Jumper options menu
+### Jumpy options menu
 
-![Showreel.003.png](Resources/Documentation/Showreel/Showreel.003.png "Jumper options")
+![Showreel.003.png](Resources/Documentation/Showreel/Showreel.003.png "Jumpy options")
 
 ### Custom trigger configuration
 
-![Showreel.004.png](Resources/Documentation/Showreel/Showreel.004.png "Jumper custom triggers")
+![Showreel.004.png](Resources/Documentation/Showreel/Showreel.004.png "Jumpy custom triggers")
 
 
 <a name="iOS to macOS MIDI Network Session" />
