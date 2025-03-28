@@ -2,13 +2,13 @@
 cd ../../../
 
 # set convenience variables
-AppBundlePath=Builds/MacOSX/build/Release/Jumper.app
+AppBundlePath=Builds/MacOSX/build/Release/Jumpy.app
 ChangeLogPath=CHANGELOG.md
 CreateDmgPath=submodules/create-dmg/create-dmg
 LicensePath=LICENSE
-IconSetSourcePng=Jumper.png
+IconSetSourcePng=Jumpy.png
 VolIconPath=Resources/Images/Iconset.icns
-DmgTargetPath=Jumper.dmg
+DmgTargetPath=Jumpy.dmg
 DmgContentsCollectionPath=ContentsPath
 
 # create the icns from existing png

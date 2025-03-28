@@ -1,6 +1,6 @@
 /* Copyright (c) 2024, Christian Ahrens
  *
- * This file is part of Mema <https://github.com/ChristianAhrens/Mema>
+ * This file is part of Jumpy <https://github.com/ChristianAhrens/Jumpy>
  *
  * This tool is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -16,32 +16,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "JumperConfiguration.h"
+#include "JumpyConfiguration.h"
 
-namespace Jumper
+namespace Jumpy
 {
 
-JumperConfiguration::JumperConfiguration(const juce::File& file)
+JumpyConfiguration::JumpyConfiguration(const juce::File& file)
 	: JUCEAppBasics::AppConfigurationBase()
 {
-	InitializeBase(file, JUCEAppBasics::AppConfigurationBase::Version::FromString(JUMPER_CONFIG_VERSION));
+	InitializeBase(file, JUCEAppBasics::AppConfigurationBase::Version::FromString(JUMPY_CONFIG_VERSION));
 }
 
-JumperConfiguration::~JumperConfiguration()
+JumpyConfiguration::~JumpyConfiguration()
 {
 }
 
-bool JumperConfiguration::isValid()
+bool JumpyConfiguration::isValid()
 {
 	return isValid(m_xml);
 }
 
-bool JumperConfiguration::isValid(const std::unique_ptr<juce::XmlElement>& xmlConfig)
+bool JumpyConfiguration::isValid(const std::unique_ptr<juce::XmlElement>& xmlConfig)
 {
 	if (!JUCEAppBasics::AppConfigurationBase::isValid(xmlConfig))
 		return false;
 
-	auto devSectionElement = xmlConfig->getChildByName(JumperConfiguration::getTagName(JumperConfiguration::TagID::DEVCONFIG));
+	auto devSectionElement = xmlConfig->getChildByName(JumpyConfiguration::getTagName(JumpyConfiguration::TagID::DEVCONFIG));
 	if (devSectionElement)
 	{
 		// validate ?
@@ -49,7 +49,7 @@ bool JumperConfiguration::isValid(const std::unique_ptr<juce::XmlElement>& xmlCo
 	else
 		return false;
 
-	auto ctSectionElement = xmlConfig->getChildByName(JumperConfiguration::getTagName(JumperConfiguration::TagID::CUSTOMTRIGGERS));
+	auto ctSectionElement = xmlConfig->getChildByName(JumpyConfiguration::getTagName(JumpyConfiguration::TagID::CUSTOMTRIGGERS));
 	if (ctSectionElement)
 	{
 		// validate ?
@@ -60,13 +60,13 @@ bool JumperConfiguration::isValid(const std::unique_ptr<juce::XmlElement>& xmlCo
 	return true;
 }
 
-bool JumperConfiguration::ResetToDefault()
+bool JumpyConfiguration::ResetToDefault()
 {
 	auto xmlConfig = juce::parseXML(juce::String(BinaryData::Default_config, BinaryData::Default_configSize));
 	if (xmlConfig)
 	{
 
-		if (Jumper::JumperConfiguration::isValid(xmlConfig))
+		if (Jumpy::JumpyConfiguration::isValid(xmlConfig))
 		{
 
 			SetFlushAndUpdateDisabled();
@@ -103,14 +103,14 @@ bool JumperConfiguration::ResetToDefault()
 	return false;
 }
 
-bool JumperConfiguration::HandleConfigVersionConflict(const JUCEAppBasics::AppConfigurationBase::Version& configVersionFound)
+bool JumpyConfiguration::HandleConfigVersionConflict(const JUCEAppBasics::AppConfigurationBase::Version& configVersionFound)
 {
-	if (configVersionFound != JUCEAppBasics::AppConfigurationBase::Version::FromString(JUMPER_CONFIG_VERSION))
+	if (configVersionFound != JUCEAppBasics::AppConfigurationBase::Version::FromString(JUMPY_CONFIG_VERSION))
 	{
 		auto conflictTitle = "Incompatible configuration version";
 		auto conflictInfo = "The configuration file version detected\ncannot be handled by this version of " + juce::JUCEApplication::getInstance()->getApplicationName();
 #ifdef DEBUG
-		conflictInfo << "\n(Found " + configVersionFound.ToString() + ", expected " + JUMPER_CONFIG_VERSION + ")";
+		conflictInfo << "\n(Found " + configVersionFound.ToString() + ", expected " + JUMPY_CONFIG_VERSION + ")";
 #endif
 		juce::AlertWindow::showOkCancelBox(juce::MessageBoxIconType::WarningIcon, conflictTitle, conflictInfo, "Reset to default", "Quit", nullptr, juce::ModalCallbackFunction::create([this](int result) {
 			if (1 == result)
@@ -130,4 +130,4 @@ bool JumperConfiguration::HandleConfigVersionConflict(const JUCEAppBasics::AppCo
 }	
 
 
-} // namespace Jumper
+} // namespace Jumpy
