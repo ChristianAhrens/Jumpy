@@ -1,6 +1,8 @@
 ![Showreel.001.png](Resources/Documentation/Showreel/Showreel.001.png "Jumpy Headline Icons")
 
-See [LATEST RELEASE](https://github.com/ChristianAhrens/Jumpy/releases/latest) for available binary packages
+See [LATEST RELEASE](https://github.com/ChristianAhrens/Jumpy/releases/latest) for available binary packages or join iOS TestFlight Beta:
+
+<img src="Resources/AppStore/TestFlightQRCode.png" alt="TestFlight QR Code" width="15%">
 
 
 <a name="toc" />
