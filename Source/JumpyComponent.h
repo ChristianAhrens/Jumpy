@@ -32,6 +32,7 @@ namespace Jumpy
  * fwd. Decls.
  */
 class AboutComponent;
+class MidiInputCallbackToStdFuncWrapper;
 
 class JumpyComponent :   
     public juce::Component, 
@@ -51,7 +52,7 @@ public:
         LookAndFeel_Last = LookAndFeel_Light,
         OscPort,
         FrameRate,
-        OutputDevice,
+        MidiIODevices,
     };
 
 public:
@@ -69,7 +70,10 @@ public:
     void connectToOscSocket();
 
     //==============================================================================
-    void oscMessageReceived(const OSCMessage& message) override;
+    void oscMessageReceived(const juce::OSCMessage& message) override;
+
+    //==============================================================================
+    void midiMessageReceived(const juce::MidiMessage& message);
 
     //==========================================================================
     void performConfigurationDump() override;
@@ -90,11 +94,18 @@ private:
     void handleOptionsLookAndFeelMenuResult(int selectedId);
     void handleOptionsOscPortMenuResult();
     void handleOptionsFramerateMenuResult();
+    void handleOptionsInputDeviceSelectionMenuResult(int selectedId);
     void handleOptionsOutputDeviceSelectionMenuResult(int selectedId);
+
+    int getInputDeviceOptionIdRangeStart();
+    int getInputDeviceOptionIdRangeEnd();
+    int getOutputDeviceOptionIdRangeStart();
+    int getOutputDeviceOptionIdRangeEnd();
 
     //==============================================================================
     void updateAvailableDevices();
-    void openMidiDevice(const juce::String& deviceIdentifier);
+    void openMidiInputDevice(const juce::String& deviceIdentifier);
+    void openMidiOutputDevice(const juce::String& deviceIdentifier);
     void sendMessage(TimeStamp ts, int frameRate);
     void sendMessage();
 
@@ -131,6 +142,9 @@ private:
     static constexpr double                             sc_customTriggersGrid_NodeGap = 2.0;
 
     juce::Array<juce::MidiDeviceInfo>                   m_currentMidiInputDevicesInfos;
+    std::unique_ptr<juce::MidiInput>                    m_midiInput;
+    std::unique_ptr<MidiInputCallbackToStdFuncWrapper>  m_midiCallbackWrapper;
+
     juce::Array<juce::MidiDeviceInfo>                   m_currentMidiOutputDevicesInfos;
     std::unique_ptr<juce::MidiOutput>                   m_midiOutput;
 

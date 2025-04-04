@@ -34,6 +34,7 @@ public:
     enum TagID
     {
         DEVCONFIG,
+        MIDIINPUT,
         MIDIOUTPUT,
         CUSTOMTRIGGERS,
         TRIGGERDETAILS
@@ -44,6 +45,8 @@ public:
         {
         case DEVCONFIG:
             return "DEVICECONFIG";
+        case MIDIINPUT:
+            return "MIDIINPUT";
         case MIDIOUTPUT:
             return "MIDIOUTPUT";
         case CUSTOMTRIGGERS:

@@ -162,6 +162,18 @@ private:
     juce::Rectangle<int>    m_minIdealSize;
 };
 
+class MidiInputCallbackToStdFuncWrapper : public juce::MidiInputCallback
+{
+public:
+    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override
+    {
+        if (onMidiMessageReceived)
+            onMidiMessageReceived(source, message);
+    };
+
+    std::function<void(juce::MidiInput*, const juce::MidiMessage&)> onMidiMessageReceived;
+};
+
 
 JumpyComponent::JumpyComponent()
     : juce::Component()
@@ -196,13 +208,19 @@ JumpyComponent::JumpyComponent()
         for (int i = JumpyOptionsOption::LookAndFeel_First; i <= JumpyOptionsOption::LookAndFeel_Last; i++)
             lookAndFeelSubMenu.addItem(i, m_optionsItems[i].first, true, m_optionsItems[i].second == 1);
 
+        juce::PopupMenu midiInputSubMenu;
+        m_currentMidiInputDevicesInfos = juce::MidiInput::getAvailableDevices();
+        for (int i = getInputDeviceOptionIdRangeStart(); i < getInputDeviceOptionIdRangeEnd(); i++)
+            midiInputSubMenu.addItem(i, m_optionsItems[i].first, true, m_optionsItems[i].second == 1);
+
         juce::PopupMenu midiOutputSubMenu;
         m_currentMidiOutputDevicesInfos = juce::MidiOutput::getAvailableDevices();
-        for (int i = JumpyOptionsOption::OutputDevice; i < JumpyOptionsOption::OutputDevice + m_currentMidiOutputDevicesInfos.size(); i++)
+        for (int i = getOutputDeviceOptionIdRangeStart(); i < getOutputDeviceOptionIdRangeEnd(); i++)
             midiOutputSubMenu.addItem(i, m_optionsItems[i].first, true, m_optionsItems[i].second == 1);
 
         juce::PopupMenu optionsMenu;
         optionsMenu.addSubMenu("LookAndFeel", lookAndFeelSubMenu);
+        optionsMenu.addSubMenu("MIDI input device", midiInputSubMenu);
         optionsMenu.addSubMenu("MIDI output device", midiOutputSubMenu);
         optionsMenu.addSeparator();
         optionsMenu.addItem(JumpyOptionsOption::OscPort, "OSC port: " + juce::String(m_oscPortNumber));
@@ -264,6 +282,12 @@ JumpyComponent::JumpyComponent()
     for (int i = 0; i < sc_customTriggersGrid_RowCount; i++)
         m_customTriggersGrid.templateRows.add(juce::Grid::TrackInfo(juce::Grid::Fr(1)));
     ResetCustomTriggers();
+
+    m_midiCallbackWrapper = std::make_unique<MidiInputCallbackToStdFuncWrapper>();
+    m_midiCallbackWrapper->onMidiMessageReceived = [=](const juce::MidiInput* input, const juce::MidiMessage& message) {
+        if (input == m_midiInput.get())
+            midiMessageReceived(message);
+    };
 
     updateAvailableDevices();
 
@@ -398,6 +422,19 @@ void JumpyComponent::oscMessageReceived(const OSCMessage& message)
     }
 }
 
+void JumpyComponent::midiMessageReceived(const juce::MidiMessage& message)
+{
+    for (auto const& ct : m_customTriggers)
+    {
+        if (ct.second)
+        {
+            auto& customTriggerDetails = ct.second->getTriggerDetails();
+            if (customTriggerDetails.m_midiTrigger.isMatchingCommand(message) && customTriggerDetails.m_TS.isValid())
+                setAndSendTimeCode(ct.second->getTriggerDetails().m_TS);
+        }
+    }
+}
+
 void JumpyComponent::performConfigurationDump()
 {
     if (m_config)
@@ -409,6 +446,9 @@ void JumpyComponent::performConfigurationDump()
             auto deviceConfigXml = std::make_unique<juce::XmlElement>(JumpyConfiguration::getTagName(JumpyConfiguration::TagID::DEVCONFIG));
             deviceConfigXml->setAttribute(JumpyConfiguration::getAttributeName(JumpyConfiguration::AttributeID::FRAMERATE), juce::String(m_frameRate));
             deviceConfigXml->setAttribute(JumpyConfiguration::getAttributeName(JumpyConfiguration::AttributeID::OSCPORT), juce::String(m_oscPortNumber));
+            auto midiInputXml = std::make_unique<juce::XmlElement>(JumpyConfiguration::getTagName(JumpyConfiguration::TagID::MIDIINPUT));
+            if (m_midiInput) midiInputXml->addTextElement(m_midiInput->getIdentifier());
+            deviceConfigXml->addChildElement(midiInputXml.release());
             auto midiOutputXml = std::make_unique<juce::XmlElement>(JumpyConfiguration::getTagName(JumpyConfiguration::TagID::MIDIOUTPUT));
             if (m_midiOutput) midiOutputXml->addTextElement(m_midiOutput->getIdentifier());
             deviceConfigXml->addChildElement(midiOutputXml.release());
@@ -437,13 +477,31 @@ void JumpyComponent::onConfigUpdated()
         m_frameRate = deviceConfigXml->getIntAttribute(JumpyConfiguration::getAttributeName(JumpyConfiguration::AttributeID::FRAMERATE));
 
         m_oscPortNumber = deviceConfigXml->getIntAttribute(JumpyConfiguration::getAttributeName(JumpyConfiguration::AttributeID::OSCPORT));
-        
-        auto midiDeviceIdentifier = deviceConfigXml->getChildElementAllSubText(JumpyConfiguration::getTagName(JumpyConfiguration::TagID::MIDIOUTPUT), "");
-        if (midiDeviceIdentifier.isNotEmpty())
+
+        auto midiInputDeviceIdentifier = deviceConfigXml->getChildElementAllSubText(JumpyConfiguration::getTagName(JumpyConfiguration::TagID::MIDIINPUT), "");
+        auto midiInputDeviceName = juce::String();
+        for (auto const& midiInputDeviceInfo : m_currentMidiInputDevicesInfos)
+            if (midiInputDeviceInfo.identifier == midiInputDeviceIdentifier)
+                midiInputDeviceName = midiInputDeviceInfo.name;
+        if (midiInputDeviceIdentifier.isNotEmpty() && midiInputDeviceName.isNotEmpty())
         {
-            for (auto i = 0; i <= m_optionsItems.size() - JumpyOptionsOption::OutputDevice; i++)
-                m_optionsItems[JumpyOptionsOption::OutputDevice + i].second = m_optionsItems[JumpyOptionsOption::OutputDevice + i].first == midiDeviceIdentifier;
-            openMidiDevice(midiDeviceIdentifier);
+            for (auto i = getInputDeviceOptionIdRangeStart(); i < getInputDeviceOptionIdRangeEnd(); i++)
+                m_optionsItems[i].second = m_optionsItems[i].first == midiInputDeviceName;
+            openMidiInputDevice(midiInputDeviceIdentifier);
+        }
+        else
+            m_midiInput.reset();
+
+        auto midiOutputDeviceIdentifier = deviceConfigXml->getChildElementAllSubText(JumpyConfiguration::getTagName(JumpyConfiguration::TagID::MIDIOUTPUT), "");
+        auto midiOutputDeviceName = juce::String();
+        for (auto const& midiOutputDeviceInfo : m_currentMidiOutputDevicesInfos)
+            if (midiOutputDeviceInfo.identifier == midiOutputDeviceIdentifier)
+                midiOutputDeviceName = midiOutputDeviceInfo.name;
+        if (midiOutputDeviceIdentifier.isNotEmpty() && midiOutputDeviceName.isNotEmpty())
+        {
+            for (auto i = getOutputDeviceOptionIdRangeStart(); i < getOutputDeviceOptionIdRangeEnd(); i++)
+                m_optionsItems[i].second = m_optionsItems[i].first == midiOutputDeviceName;
+            openMidiOutputDevice(midiOutputDeviceIdentifier);
         }
         else
             m_midiOutput.reset();
@@ -460,7 +518,10 @@ void JumpyComponent::onConfigUpdated()
             {
                 auto key = elm->getIntAttribute(JumpyConfiguration::getAttributeName(JumpyConfiguration::AttributeID::IDENT));
                 if (0 < m_customTriggers.count(key) && nullptr != m_customTriggers.at(key) && !m_customTriggers.at(key)->getTriggerDetails().isEmpty())
+                {
                     m_customTriggers[key]->setTriggerDetails(CustomTriggerButton::TriggerDetails::fromString(elm->getAllSubText()));
+                    if (m_midiInput) m_customTriggers[key]->setMidiInputDeviceIdentifier(m_midiInput->getIdentifier());
+                }
             }
         }
     }
@@ -488,7 +549,9 @@ void JumpyComponent::handleOptionsMenuResult(int selectedId)
         handleOptionsOscPortMenuResult();
     else if (JumpyOptionsOption::FrameRate == selectedId)
         handleOptionsFramerateMenuResult();
-    else if (JumpyOptionsOption::OutputDevice <= selectedId)
+    else if (getInputDeviceOptionIdRangeStart() <= selectedId && getInputDeviceOptionIdRangeEnd() > selectedId)
+        handleOptionsInputDeviceSelectionMenuResult(selectedId);
+    else if (getOutputDeviceOptionIdRangeStart() <= selectedId && getOutputDeviceOptionIdRangeEnd() > selectedId)
         handleOptionsOutputDeviceSelectionMenuResult(selectedId);
     else
         jassertfalse; // unhandled menu entry!?
@@ -567,18 +630,18 @@ void JumpyComponent::handleOptionsFramerateMenuResult()
         }));
 }
 
-void JumpyComponent::handleOptionsOutputDeviceSelectionMenuResult(int selectedId)
+void JumpyComponent::handleOptionsInputDeviceSelectionMenuResult(int selectedId)
 {
-    int selectedDeviceIdx = selectedId - JumpyOptionsOption::OutputDevice;
-    if (JumpyOptionsOption::OutputDevice + selectedDeviceIdx <= m_optionsItems.size() && selectedDeviceIdx <= m_currentMidiOutputDevicesInfos.size())
+    int selectedDeviceIdx = selectedId - getInputDeviceOptionIdRangeStart();
+    if (getInputDeviceOptionIdRangeStart() + selectedDeviceIdx <= m_optionsItems.size() && selectedDeviceIdx <= m_currentMidiInputDevicesInfos.size())
     {
-        for (auto i = 0; i <= m_optionsItems.size() - JumpyOptionsOption::OutputDevice; i++)
-            m_optionsItems[JumpyOptionsOption::OutputDevice + i].second = i == selectedDeviceIdx;
-        auto midiOutputIdentifier = m_currentMidiOutputDevicesInfos[selectedDeviceIdx].identifier;
-        openMidiDevice(midiOutputIdentifier);
+        for (auto i = getInputDeviceOptionIdRangeStart(); i < getInputDeviceOptionIdRangeEnd(); i++)
+            m_optionsItems[getInputDeviceOptionIdRangeStart()].second = (i - getInputDeviceOptionIdRangeStart()) == selectedDeviceIdx;
+        auto midiInputIdentifier = m_currentMidiInputDevicesInfos[selectedDeviceIdx].identifier;
+        openMidiInputDevice(midiInputIdentifier);
 
         if (m_config)
-            m_config->triggerConfigurationDump();
+            m_config->triggerConfigurationDump(false);
     }
     else
     {
@@ -586,17 +649,76 @@ void JumpyComponent::handleOptionsOutputDeviceSelectionMenuResult(int selectedId
     }
 }
 
-void JumpyComponent::updateAvailableDevices()
+void JumpyComponent::handleOptionsOutputDeviceSelectionMenuResult(int selectedId)
 {
-    m_currentMidiOutputDevicesInfos = juce::MidiOutput::getAvailableDevices();
-    for (int i = 0; i < m_currentMidiOutputDevicesInfos.size(); i++)
+    int selectedDeviceIdx = selectedId - getOutputDeviceOptionIdRangeStart();
+    if (getOutputDeviceOptionIdRangeStart() + selectedDeviceIdx <= m_optionsItems.size() && selectedDeviceIdx <= m_currentMidiOutputDevicesInfos.size())
     {
-        m_optionsItems[JumpyOptionsOption::OutputDevice + i].first = m_currentMidiOutputDevicesInfos[i].name.toStdString();
-        m_optionsItems[JumpyOptionsOption::OutputDevice + i].second = int(false);
+        for (auto i = getOutputDeviceOptionIdRangeStart(); i < getOutputDeviceOptionIdRangeEnd(); i++)
+            m_optionsItems[getOutputDeviceOptionIdRangeStart()].second = (i - getOutputDeviceOptionIdRangeStart()) == selectedDeviceIdx;
+        auto midiOutputIdentifier = m_currentMidiOutputDevicesInfos[selectedDeviceIdx].identifier;
+        openMidiOutputDevice(midiOutputIdentifier);
+
+        if (m_config)
+            m_config->triggerConfigurationDump(false);
+    }
+    else
+    {
+        jassertfalse;
     }
 }
 
-void JumpyComponent::openMidiDevice(const juce::String& deviceIdentifier)
+int JumpyComponent::getInputDeviceOptionIdRangeStart()
+{
+    return JumpyOptionsOption::MidiIODevices;
+}
+
+int JumpyComponent::getInputDeviceOptionIdRangeEnd()
+{
+    return JumpyOptionsOption::MidiIODevices + m_currentMidiInputDevicesInfos.size();
+}
+
+int JumpyComponent::getOutputDeviceOptionIdRangeStart()
+{
+    return JumpyOptionsOption::MidiIODevices + m_currentMidiInputDevicesInfos.size();
+}
+
+int JumpyComponent::getOutputDeviceOptionIdRangeEnd()
+{
+    return JumpyOptionsOption::MidiIODevices + m_currentMidiInputDevicesInfos.size() + m_currentMidiOutputDevicesInfos.size();
+}
+
+void JumpyComponent::updateAvailableDevices()
+{
+    m_currentMidiInputDevicesInfos = juce::MidiInput::getAvailableDevices();
+    for (int i = 0; i < m_currentMidiInputDevicesInfos.size(); i++)
+    {
+        m_optionsItems[getInputDeviceOptionIdRangeStart() + i].first = m_currentMidiInputDevicesInfos[i].name.toStdString();
+        m_optionsItems[getInputDeviceOptionIdRangeStart() + i].second = int(false);
+    }
+
+    m_currentMidiOutputDevicesInfos = juce::MidiOutput::getAvailableDevices();
+    for (int i = 0; i < m_currentMidiOutputDevicesInfos.size(); i++)
+    {
+        m_optionsItems[getOutputDeviceOptionIdRangeStart() + i].first = m_currentMidiOutputDevicesInfos[i].name.toStdString();
+        m_optionsItems[getOutputDeviceOptionIdRangeStart() + i].second = int(false);
+    }
+}
+
+void JumpyComponent::openMidiInputDevice(const juce::String& deviceIdentifier)
+{
+    m_midiInput = juce::MidiInput::openDevice(deviceIdentifier, m_midiCallbackWrapper.get());
+    m_midiInput->start();
+    jassert(m_midiInput);
+
+    for (auto const& ct : m_customTriggers)
+    {
+        if (ct.second)
+            ct.second->setMidiInputDeviceIdentifier(deviceIdentifier);
+    }
+}
+
+void JumpyComponent::openMidiOutputDevice(const juce::String& deviceIdentifier)
 {
     m_midiOutput = juce::MidiOutput::openDevice(deviceIdentifier);
     jassert(m_midiOutput);
