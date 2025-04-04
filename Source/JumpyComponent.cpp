@@ -286,7 +286,14 @@ JumpyComponent::JumpyComponent()
     m_midiCallbackWrapper = std::make_unique<MidiInputCallbackToStdFuncWrapper>();
     m_midiCallbackWrapper->onMidiMessageReceived = [=](const juce::MidiInput* input, const juce::MidiMessage& message) {
         if (input == m_midiInput.get())
-            midiMessageReceived(message);
+        {
+            // threadsafe storing of incoming data to async processing queue
+            {
+                std::lock_guard<std::mutex> l(m_midiInputMessageQueueMutex);
+                m_midiInputMessageQueue.push_back(message);
+            }
+            juce::MessageManager::callAsync([=]() { midiMessageReceived(); });
+        }
     };
 
     updateAvailableDevices();
@@ -422,15 +429,24 @@ void JumpyComponent::oscMessageReceived(const OSCMessage& message)
     }
 }
 
-void JumpyComponent::midiMessageReceived(const juce::MidiMessage& message)
+void JumpyComponent::midiMessageReceived()
 {
-    for (auto const& ct : m_customTriggers)
+    std::vector<juce::MidiMessage> messageQueueCopy;
     {
-        if (ct.second)
+        std::lock_guard<std::mutex> l(m_midiInputMessageQueueMutex);
+        messageQueueCopy = m_midiInputMessageQueue;
+    }
+
+    for (auto const& midiMesage : messageQueueCopy)
+    {
+        for (auto const& ct : m_customTriggers)
         {
-            auto& customTriggerDetails = ct.second->getTriggerDetails();
-            if (customTriggerDetails.m_midiTrigger.isMatchingCommand(message) && customTriggerDetails.m_TS.isValid())
-                setAndSendTimeCode(ct.second->getTriggerDetails().m_TS);
+            if (ct.second)
+            {
+                auto& customTriggerDetails = ct.second->getTriggerDetails();
+                if (customTriggerDetails.m_midiTrigger.isMatchingCommand(midiMesage) && customTriggerDetails.m_TS.isValid())
+                    setAndSendTimeCode(ct.second->getTriggerDetails().m_TS);
+            }
         }
     }
 }

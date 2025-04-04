@@ -73,7 +73,7 @@ public:
     void oscMessageReceived(const juce::OSCMessage& message) override;
 
     //==============================================================================
-    void midiMessageReceived(const juce::MidiMessage& message);
+    void midiMessageReceived();
 
     //==========================================================================
     void performConfigurationDump() override;
@@ -144,13 +144,15 @@ private:
     juce::Array<juce::MidiDeviceInfo>                   m_currentMidiInputDevicesInfos;
     std::unique_ptr<juce::MidiInput>                    m_midiInput;
     std::unique_ptr<MidiInputCallbackToStdFuncWrapper>  m_midiCallbackWrapper;
+    std::vector<juce::MidiMessage>                      m_midiInputMessageQueue;
+    std::mutex                                          m_midiInputMessageQueueMutex;
 
     juce::Array<juce::MidiDeviceInfo>                   m_currentMidiOutputDevicesInfos;
     std::unique_ptr<juce::MidiOutput>                   m_midiOutput;
 
     std::unique_ptr<juce::OSCReceiver>                  m_oscServer;
 
-    std::unique_ptr<JumpyConfiguration>                m_config;
+    std::unique_ptr<JumpyConfiguration>                 m_config;
 
     TimeStamp m_ts;
     int m_frameRate = 1; // 24fps=00, 25fps=01, 29,97fps=10, 30fps=11
