@@ -6,15 +6,18 @@ AppBundlePath=Builds/MacOSX/build/Release/Jumpy.app
 ChangeLogPath=CHANGELOG.md
 CreateDmgPath=submodules/create-dmg/create-dmg
 LicensePath=LICENSE
-IconSetSourcePng=Jumpy.png
+IconSetSourcePng=JumpyRect.png
+IconSetSourceDiskPng=disk-icon.png
 VolIconPath=Resources/Images/Iconset.icns
 DmgTargetPath=Jumpy.dmg
 DmgContentsCollectionPath=ContentsPath
 
 # create the icns from existing png
 cd Resources/Images
+chmod +x makeDmgIcon.sh
+./makeDmgIcon.sh "$IconSetSourcePng" "$IconSetSourceDiskPng" dmgIcon.png
 chmod +x makeIconset.sh
-./makeIconset.sh "$IconSetSourcePng"
+./makeIconset.sh dmgIcon.png
 cd ../../
 
 # collect dmg contents
@@ -31,3 +34,5 @@ test -f "$DmgTargetPath" && rm "$DmgTargetPath"
 # cleanup
 test -d "$DmgContentsCollectionPath" && rm -r "$DmgContentsCollectionPath"
 test -f "$VolIconPath" && rm "$VolIconPath"
+
+rm dmgIcon.png
