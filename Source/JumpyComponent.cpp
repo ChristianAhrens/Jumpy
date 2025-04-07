@@ -435,6 +435,7 @@ void JumpyComponent::midiMessageReceived()
     {
         std::lock_guard<std::mutex> l(m_midiInputMessageQueueMutex);
         messageQueueCopy = m_midiInputMessageQueue;
+        m_midiInputMessageQueue.clear();
     }
 
     for (auto const& midiMesage : messageQueueCopy)
