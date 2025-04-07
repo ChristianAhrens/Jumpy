@@ -40,6 +40,8 @@ CustomTriggerButton::CustomTriggerButton(const juce::String& buttonName)
     m_settingsButton->setColour(juce::DrawableButton::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
     m_settingsButton->setColour(juce::DrawableButton::ColourIds::backgroundOnColourId, juce::Colours::transparentBlack);
     m_settingsButton->onClick = [=]() { showTriggerSettings(); };
+
+    lookAndFeelChanged();
 }
 
 CustomTriggerButton::~CustomTriggerButton()
@@ -182,7 +184,7 @@ void CustomTriggerButton::showTriggerSettings()
             m_midiLabel->setExplicitFocusOrder(0);
             addAndMakeVisible(m_midiLabel.get());
 
-            m_midiLearnButton = std::make_unique<JUCEAppBasics::MidiLearnerComponent>(-1, JUCEAppBasics::MidiLearnerComponent::AT_Trigger);
+            m_midiLearnButton = std::make_unique<JUCEAppBasics::MidiLearnerComponent>(std::int16_t(-1), JUCEAppBasics::MidiLearnerComponent::AT_Trigger);
             m_midiLearnButton->setSelectedDeviceIdentifier(midiInputIdentifier);
             m_midiLearnButton->setCurrentMidiAssi(td.m_midiTrigger);
             m_midiLearnButton->setExplicitFocusOrder(0);
