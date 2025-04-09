@@ -653,7 +653,7 @@ void JumpyComponent::handleOptionsInputDeviceSelectionMenuResult(int selectedId)
     if (getInputDeviceOptionIdRangeStart() + selectedDeviceIdx <= m_optionsItems.size() && selectedDeviceIdx <= m_currentMidiInputDevicesInfos.size())
     {
         for (auto i = getInputDeviceOptionIdRangeStart(); i < getInputDeviceOptionIdRangeEnd(); i++)
-            m_optionsItems[getInputDeviceOptionIdRangeStart()].second = (i - getInputDeviceOptionIdRangeStart()) == selectedDeviceIdx;
+            m_optionsItems[i].second = (i - getInputDeviceOptionIdRangeStart()) == selectedDeviceIdx;
         auto midiInputIdentifier = m_currentMidiInputDevicesInfos[selectedDeviceIdx].identifier;
         openMidiInputDevice(midiInputIdentifier);
 
@@ -672,7 +672,7 @@ void JumpyComponent::handleOptionsOutputDeviceSelectionMenuResult(int selectedId
     if (getOutputDeviceOptionIdRangeStart() + selectedDeviceIdx <= m_optionsItems.size() && selectedDeviceIdx <= m_currentMidiOutputDevicesInfos.size())
     {
         for (auto i = getOutputDeviceOptionIdRangeStart(); i < getOutputDeviceOptionIdRangeEnd(); i++)
-            m_optionsItems[getOutputDeviceOptionIdRangeStart()].second = (i - getOutputDeviceOptionIdRangeStart()) == selectedDeviceIdx;
+            m_optionsItems[i].second = (i - getOutputDeviceOptionIdRangeStart()) == selectedDeviceIdx;
         auto midiOutputIdentifier = m_currentMidiOutputDevicesInfos[selectedDeviceIdx].identifier;
         openMidiOutputDevice(midiOutputIdentifier);
 
