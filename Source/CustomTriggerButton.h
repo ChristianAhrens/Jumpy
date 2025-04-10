@@ -19,6 +19,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <MidiCommandRangeAssignment.h>
 
 
 namespace Jumpy
@@ -103,45 +104,56 @@ class CustomTriggerButton  : public juce::Button
 public:
     struct TriggerDetails
     {
-        TriggerDetails() = default;
-        TriggerDetails(const juce::String& name, const juce::Colour& colour, const TimeStamp& timestamp, const juce::OSCMessage& oscTrigger)
+        TriggerDetails()
+        {
+            m_Name = "";
+            m_Colour = juce::Colours::cornflowerblue;
+            m_TS = TimeStamp();
+            m_oscTrigger = juce::OSCMessage(juce::String("/") + juce::JUCEApplication::getInstance()->getApplicationName() + "/n");
+            m_midiTrigger = JUCEAppBasics::MidiCommandRangeAssignment();
+        }
+        TriggerDetails(const juce::String& name, const juce::Colour& colour, const TimeStamp& timestamp, const juce::OSCMessage& oscTrigger, const JUCEAppBasics::MidiCommandRangeAssignment& midiTrigger)
         {
             m_Name = name;
             m_Colour = colour;
             m_TS = timestamp;
             m_oscTrigger = oscTrigger;
+            m_midiTrigger = midiTrigger;
         }
         TriggerDetails(const juce::String& paramStr)
         {
             *this = fromString(paramStr);
         }
 
-        juce::String        m_Name;
-        juce::Colour        m_Colour;
-        TimeStamp           m_TS;
-        juce::OSCMessage    m_oscTrigger = { juce::OSCAddressPattern("/a/b"), 0 };
+        juce::String                                m_Name;
+        juce::Colour                                m_Colour;
+        TimeStamp                                   m_TS;
+        juce::OSCMessage                            m_oscTrigger = { juce::OSCAddressPattern("/a/b"), 0 };
+        JUCEAppBasics::MidiCommandRangeAssignment   m_midiTrigger;
 
         juce::String toString() const
         {
-            return m_Name + ";" + m_Colour.toString() + ";" + m_TS.toString() + ";" + m_oscTrigger.getAddressPattern().toString();
+            return m_Name + ";" + m_Colour.toString() + ";" + m_TS.toString() + ";" + m_oscTrigger.getAddressPattern().toString() + ";" + m_midiTrigger.serializeToHexString();
         }
         static TriggerDetails fromString(const juce::String& paramStr)
         {
             auto sa = juce::StringArray();
             auto cnt = sa.addTokens(paramStr, ";", "");
-            jassert(4 == cnt);
+            jassert(5 == cnt);
 
             TriggerDetails td;
             td.m_Name = sa[0];
             td.m_Colour = juce::Colour::fromString(sa[1]);
             td.m_TS = TimeStamp::fromString(sa[2]);
             td.m_oscTrigger.setAddressPattern(sa[3]);
+            if (sa[4].isNotEmpty())
+                td.m_midiTrigger.deserializeFromHexString(sa[4]);
 
             return td;
         }
         bool isEmpty() const
         {
-            return m_Name.isEmpty() && m_Colour == juce::Colour() && m_TS == TimeStamp() && m_oscTrigger.getAddressPattern().toString().isEmpty();
+            return m_Name.isEmpty() && m_Colour == juce::Colour() && m_TS == TimeStamp() && m_oscTrigger.getAddressPattern().toString().isEmpty() && m_midiTrigger == JUCEAppBasics::MidiCommandRangeAssignment();
         }
     };
 
@@ -152,6 +164,8 @@ public:
 
     void setTriggerDetails(const TriggerDetails& triggerDetails);
     const TriggerDetails& getTriggerDetails() const;
+
+    void setMidiInputDeviceIdentifier(const juce::String& midiInputDeviceIdentifier);
 
     //==============================================================================
     void clicked() override;
@@ -175,6 +189,8 @@ private:
     
     //==============================================================================
     TriggerDetails  m_triggerDetails;
+
+    juce::String    m_midiInputDeviceIdentifier;
 
     std::unique_ptr<juce::Drawable> m_addDrawable;
 

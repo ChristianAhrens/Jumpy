@@ -19,6 +19,7 @@
 #include "CustomTriggerButton.h"
 
 #include <FixedFontTextEditor.h>
+#include <MidiLearnerComponent.h>
 
 
 namespace Jumpy
@@ -39,6 +40,8 @@ CustomTriggerButton::CustomTriggerButton(const juce::String& buttonName)
     m_settingsButton->setColour(juce::DrawableButton::ColourIds::backgroundColourId, juce::Colours::transparentBlack);
     m_settingsButton->setColour(juce::DrawableButton::ColourIds::backgroundOnColourId, juce::Colours::transparentBlack);
     m_settingsButton->onClick = [=]() { showTriggerSettings(); };
+
+    lookAndFeelChanged();
 }
 
 CustomTriggerButton::~CustomTriggerButton()
@@ -70,6 +73,11 @@ void CustomTriggerButton::setTriggerDetails(const CustomTriggerButton::TriggerDe
         onDetailsChanged(m_triggerDetails);
 }
 
+void CustomTriggerButton::setMidiInputDeviceIdentifier(const juce::String& midiInputDeviceIdentifier)
+{
+    m_midiInputDeviceIdentifier = midiInputDeviceIdentifier;
+}
+
 const CustomTriggerButton::TriggerDetails& CustomTriggerButton::getTriggerDetails() const
 {
     return m_triggerDetails;
@@ -91,7 +99,7 @@ void CustomTriggerButton::mouseDown(const juce::MouseEvent& e)
     if (!isEnabled())
     {
         m_triggerDetails = TriggerDetails(getName(), juce::Colours::cornflowerblue, TimeStamp(),
-            juce::OSCMessage(juce::String("/") + juce::JUCEApplication::getInstance()->getApplicationName() + "/" + getName()));
+            juce::OSCMessage(juce::String("/") + juce::JUCEApplication::getInstance()->getApplicationName() + "/" + getName()), {});
         showTriggerSettings();
     }
 
@@ -142,7 +150,7 @@ void CustomTriggerButton::showTriggerSettings()
     class TriggerSettingsComponent : public juce::Component
     {
     public:
-        TriggerSettingsComponent(const TriggerDetails& td)
+        TriggerSettingsComponent(const TriggerDetails& td, const juce::String& midiInputIdentifier)
         {
             m_nameEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>();
             m_nameEdit->setText(td.m_Name);
@@ -171,6 +179,17 @@ void CustomTriggerButton::showTriggerSettings()
             m_oscStringEdit->setExplicitFocusOrder(0);
             addAndMakeVisible(m_oscStringEdit.get());
 
+            m_midiLabel = std::make_unique<juce::Label>("midiLabel", "MIDI:");
+            m_midiLabel->setJustificationType(juce::Justification::centredBottom);
+            m_midiLabel->setExplicitFocusOrder(0);
+            addAndMakeVisible(m_midiLabel.get());
+
+            m_midiLearnButton = std::make_unique<JUCEAppBasics::MidiLearnerComponent>(std::int16_t(-1), JUCEAppBasics::MidiLearnerComponent::AT_Trigger);
+            m_midiLearnButton->setSelectedDeviceIdentifier(midiInputIdentifier);
+            m_midiLearnButton->setCurrentMidiAssi(td.m_midiTrigger);
+            m_midiLearnButton->setExplicitFocusOrder(0);
+            addAndMakeVisible(m_midiLearnButton.get());
+
             m_okButton = std::make_unique<juce::TextButton>("OkButton");
             m_okButton->setButtonText("Ok");
             m_okButton->onClick = [=]() { findParentComponentOfClass<CallOutBox>()->exitModalState(0); };
@@ -182,7 +201,9 @@ void CustomTriggerButton::showTriggerSettings()
         ~TriggerSettingsComponent() override
         {
             if (onFinished)
-                onFinished(TriggerDetails(m_nameEdit->getText(), m_colourSelector->getCurrentColour(), TimeStamp(m_tcEdit->getText()), juce::OSCMessage(m_oscStringEdit->getText())));
+                onFinished(TriggerDetails(m_nameEdit->getText(), m_colourSelector->getCurrentColour(), TimeStamp(m_tcEdit->getText()),
+                    juce::OSCMessage(m_oscStringEdit->getText()),
+                    m_midiLearnButton->getCurrentMidiAssi()));
         }
 
         void resized() override
@@ -193,6 +214,9 @@ void CustomTriggerButton::showTriggerSettings()
             m_tcEdit->setBounds(bounds.removeFromTop(30).reduced(5));
             m_okButton->setBounds(bounds.removeFromBottom(30).removeFromRight(bounds.getWidth() / 2).reduced(1));
             bounds.removeFromBottom(20);
+            auto midiBounds = bounds.removeFromBottom(30);
+            m_midiLabel->setBounds(midiBounds.removeFromLeft(40).reduced(0, 5));
+            m_midiLearnButton->setBounds(midiBounds.reduced(3));
             auto oscBounds = bounds.removeFromBottom(30);
             m_oscLabel->setBounds(oscBounds.removeFromLeft(40).reduced(0, 5));
             m_oscStringEdit->setBounds(oscBounds.reduced(5));
@@ -202,16 +226,18 @@ void CustomTriggerButton::showTriggerSettings()
         std::function<void(const TriggerDetails&)>  onFinished;
 
     private:
-        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_nameEdit;
-        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_tcEdit;
-        std::unique_ptr<juce::ColourSelector>               m_colourSelector;
-        std::unique_ptr<juce::Label>                        m_oscLabel;
-        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor> m_oscStringEdit;
-        std::unique_ptr<juce::TextButton>                   m_okButton;
+        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor>     m_nameEdit;
+        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor>     m_tcEdit;
+        std::unique_ptr<juce::ColourSelector>                   m_colourSelector;
+        std::unique_ptr<juce::Label>                            m_oscLabel;
+        std::unique_ptr<JUCEAppBasics::FixedFontTextEditor>     m_oscStringEdit;
+        std::unique_ptr<juce::Label>                            m_midiLabel;
+        std::unique_ptr<JUCEAppBasics::MidiLearnerComponent>    m_midiLearnButton;
+        std::unique_ptr<juce::TextButton>                       m_okButton;
     };
 
 
-    auto tsc = std::make_unique<TriggerSettingsComponent>(m_triggerDetails);
+    auto tsc = std::make_unique<TriggerSettingsComponent>(m_triggerDetails, m_midiInputDeviceIdentifier);
     tsc->onFinished = [=](const TriggerDetails& td) { setTriggerDetails(td); repaint(); };
 
     juce::CallOutBox::launchAsynchronously(std::move(tsc), ((isEnabled() && m_settingsButton) ? m_settingsButton->getScreenBounds() : getScreenBounds()), nullptr);
