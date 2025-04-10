@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="ja98xe" name="Jumpy" projectType="guiapp" useAppConfig="0"
-              jucerFormatVersion="1" version="0.3.1" companyWebsite="github.com/ChristianAhrens/Jumpy"
+              jucerFormatVersion="1" version="0.4.0" companyWebsite="github.com/ChristianAhrens/Jumpy"
               bundleIdentifier="com.ChristianAhrens.Jumpy" headerPath="../../submodules/JUCE-AppBasics/Source"
               defines="JUCE_DISPLAY_SPLASH_SCREEN=0" companyName="ChristianAhrens"
               companyCopyright="Copyright (c) 2025 Christian Ahrens.">
@@ -20,8 +20,18 @@
               file="submodules/JUCE-AppBasics/Source/FixedFontTextEditor.cpp"/>
         <FILE id="fJsS71" name="FixedFontTextEditor.h" compile="0" resource="0"
               file="submodules/JUCE-AppBasics/Source/FixedFontTextEditor.h"/>
+        <FILE id="VtgwaW" name="Image_utils.cpp" compile="1" resource="0" file="submodules/JUCE-AppBasics/Source/Image_utils.cpp"/>
+        <FILE id="diCIEd" name="Image_utils.h" compile="0" resource="0" file="submodules/JUCE-AppBasics/Source/Image_utils.h"/>
         <FILE id="rirILY" name="iOS_utils.cpp" compile="1" resource="0" file="submodules/JUCE-AppBasics/Source/iOS_utils.cpp"/>
         <FILE id="j4VcGn" name="iOS_utils.h" compile="0" resource="0" file="submodules/JUCE-AppBasics/Source/iOS_utils.h"/>
+        <FILE id="UhbDZ0" name="MidiCommandRangeAssignment.cpp" compile="1"
+              resource="0" file="submodules/JUCE-AppBasics/Source/MidiCommandRangeAssignment.cpp"/>
+        <FILE id="DfZIc0" name="MidiCommandRangeAssignment.h" compile="0" resource="0"
+              file="submodules/JUCE-AppBasics/Source/MidiCommandRangeAssignment.h"/>
+        <FILE id="MhV791" name="MidiLearnerComponent.cpp" compile="1" resource="0"
+              file="submodules/JUCE-AppBasics/Source/MidiLearnerComponent.cpp"/>
+        <FILE id="Vylu7j" name="MidiLearnerComponent.h" compile="0" resource="0"
+              file="submodules/JUCE-AppBasics/Source/MidiLearnerComponent.h"/>
         <FILE id="TlnNMy" name="WebUpdateDetector.cpp" compile="1" resource="0"
               file="submodules/JUCE-AppBasics/Source/WebUpdateDetector.cpp"/>
         <FILE id="GoL7mR" name="WebUpdateDetector.h" compile="0" resource="0"
@@ -31,6 +41,8 @@
     <GROUP id="{72AB56DC-8637-938F-3846-2BD91435687D}" name="Resources">
       <GROUP id="{5418C8BA-AFDC-83EF-A716-D3FB9CE9A772}" name="Images">
         <FILE id="g0EK1m" name="add-24px.svg" compile="0" resource="1" file="submodules/JUCE-AppBasics/Resources/Images/add-24px.svg"/>
+        <FILE id="uM9tct" name="clear_black_24dp.svg" compile="0" resource="1"
+              file="submodules/JUCE-AppBasics/Resources/Images/clear_black_24dp.svg"/>
         <FILE id="zBtsER" name="Jumpy.png" compile="0" resource="1" file="Resources/Images/Jumpy.png"/>
         <FILE id="qJ0xSm" name="Jumpy.svg" compile="0" resource="1" file="Resources/Images/Jumpy.svg"/>
         <FILE id="mac4dd" name="JumpyCanvas.png" compile="0" resource="1" file="Resources/Images/JumpyCanvas.png"/>
@@ -40,6 +52,7 @@
               file="submodules/JUCE-AppBasics/Resources/Images/play_arrow-24px.svg"/>
         <FILE id="K7Q71Y" name="question_mark_24dp.svg" compile="0" resource="1"
               file="submodules/JUCE-AppBasics/Resources/Images/question_mark_24dp.svg"/>
+        <FILE id="XneNx6" name="school-24px.svg" compile="0" resource="1" file="submodules/JUCE-AppBasics/Resources/Images/school-24px.svg"/>
         <FILE id="IdwGXE" name="settings-24px.svg" compile="0" resource="1"
               file="submodules/JUCE-AppBasics/Resources/Images/settings-24px.svg"/>
       </GROUP>
