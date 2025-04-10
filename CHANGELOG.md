@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+## [0.4.0] 2025-04-10
+### Added
+- Added MIDI triggering support to CustomTrigger buttons
+
+### Changed
+- Changed macOS dmg icon to be auto generated and more like a disk image :)
+
+### Fixed
+- Fixed UI updating after config reset
+
 ## [0.3.0] 2025-03-28
 ### Added
 - Added OSC port configurability
