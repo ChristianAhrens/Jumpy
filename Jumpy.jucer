@@ -32,6 +32,10 @@
               file="submodules/JUCE-AppBasics/Source/MidiLearnerComponent.cpp"/>
         <FILE id="Vylu7j" name="MidiLearnerComponent.h" compile="0" resource="0"
               file="submodules/JUCE-AppBasics/Source/MidiLearnerComponent.h"/>
+        <FILE id="H9GMVu" name="ToggleStateSlider.cpp" compile="1" resource="0"
+              file="submodules/JUCE-AppBasics/Source/ToggleStateSlider.cpp"/>
+        <FILE id="eWzpcu" name="ToggleStateSlider.h" compile="0" resource="0"
+              file="submodules/JUCE-AppBasics/Source/ToggleStateSlider.h"/>
         <FILE id="TlnNMy" name="WebUpdateDetector.cpp" compile="1" resource="0"
               file="submodules/JUCE-AppBasics/Source/WebUpdateDetector.cpp"/>
         <FILE id="GoL7mR" name="WebUpdateDetector.h" compile="0" resource="0"
