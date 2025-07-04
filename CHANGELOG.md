@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+## [0.4.1] 2025-07-04
+### Added
+
+### Changed
+- Improved app icons
+- Updated JUCE to 8.0.8
+- Updated JUCE-AppBasics to latest
+
+### Fixed
+
 ## [0.4.0] 2025-04-10
 ### Added
 - Added MIDI triggering support to CustomTrigger buttons
