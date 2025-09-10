@@ -49,7 +49,6 @@
               file="submodules/JUCE-AppBasics/Resources/Images/clear_black_24dp.svg"/>
         <FILE id="zBtsER" name="Jumpy.png" compile="0" resource="1" file="Resources/Images/Jumpy.png"/>
         <FILE id="qJ0xSm" name="Jumpy.svg" compile="0" resource="1" file="Resources/Images/Jumpy.svg"/>
-        <FILE id="mac4dd" name="JumpyCanvas.png" compile="0" resource="1" file="Resources/Images/JumpyCanvas.png"/>
         <FILE id="fcf7ir" name="JumpyRect.png" compile="0" resource="1" file="Resources/Images/JumpyRect.png"/>
         <FILE id="HKxLML" name="menu_24dp.svg" compile="0" resource="1" file="submodules/JUCE-AppBasics/Resources/Images/menu_24dp.svg"/>
         <FILE id="Fgpjii" name="play_arrow-24px.svg" compile="0" resource="1"
@@ -98,9 +97,10 @@
   </MODULES>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="fcf7ir" bigIcon="fcf7ir"
-               iosDevelopmentTeamID="SB7Q3PP4FQ" hardenedRuntime="1" applicationCategory="public.app-category.utilities"
-               appSandbox="0">
+    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="" bigIcon="" iosDevelopmentTeamID="SB7Q3PP4FQ"
+               hardenedRuntime="1" applicationCategory="public.app-category.utilities"
+               appSandbox="0" customXcodeResourceFolders="Resources/Images/Jumpy.icon"
+               customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &lt;!-- New Xcode .icon integration --&gt;&#10;    &lt;key&gt;CFBundleIconName&lt;/key&gt;&#10;    &lt;string&gt;Jumpy&lt;/string&gt;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>
         <CONFIGURATION isDebug="0" name="Release" customXcodeFlags="OTHER_CODE_SIGN_FLAGS = $(inherited) --timestamp -s 'Developer ID Application: Christian Ahrens', CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO"
@@ -164,11 +164,11 @@
         <MODULEPATH id="juce_osc" path="submodules/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <XCODE_IPHONE targetFolder="Builds/iOS" smallIcon="mac4dd" bigIcon="mac4dd"
-                  customLaunchStoryboard="Resources/Deployment/iOS/Launchscreen.storyboard"
+    <XCODE_IPHONE targetFolder="Builds/iOS" smallIcon="" bigIcon="" customLaunchStoryboard="Resources/Deployment/iOS/Launchscreen.storyboard"
                   iosScreenOrientation="UIInterfaceOrientationLandscapeRight,UIInterfaceOrientationPortrait"
                   iPadScreenOrientation="UIInterfaceOrientationLandscapeLeft,UIInterfaceOrientationLandscapeRight,UIInterfaceOrientationPortrait,UIInterfaceOrientationPortraitUpsideDown"
-                  iosDevelopmentTeamID="SB7Q3PP4FQ" UIRequiresFullScreen="0" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#9;&lt;key&gt;UIBackgroundModes&lt;/key&gt;&#10;    &#9;&lt;array&gt;&#10;&#9;      &#9;&lt;string&gt;processing&lt;/string&gt;&#10;    &#9;&lt;/array&gt;&#10;    &lt;key&gt;BGTaskSchedulerPermittedIdentifiers&lt;/key&gt;&#10;    &lt;array&gt;&#10;      &lt;string&gt;com.ChristianAhrens.Jumper&lt;/string&gt;&#10;    &lt;/array&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;">
+                  iosDevelopmentTeamID="SB7Q3PP4FQ" UIRequiresFullScreen="0" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#9;&lt;key&gt;UIBackgroundModes&lt;/key&gt;&#10;    &#9;&lt;array&gt;&#10;&#9;      &#9;&lt;string&gt;processing&lt;/string&gt;&#10;    &#9;&lt;/array&gt;&#10;    &lt;key&gt;BGTaskSchedulerPermittedIdentifiers&lt;/key&gt;&#10;    &lt;array&gt;&#10;      &lt;string&gt;com.ChristianAhrens.Jumper&lt;/string&gt;&#10;    &lt;/array&gt;&#10;    &lt;!-- New Xcode .icon integration --&gt;&#10;    &lt;key&gt;CFBundleIconName&lt;/key&gt;&#10;    &lt;string&gt;Jumpy&lt;/string&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;"
+                  customXcodeResourceFolders="Resources/Images/Jumpy.icon">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" iosDeploymentTarget="15" iosCompatibility="15"/>
         <CONFIGURATION isDebug="0" name="Release" iosDeploymentTarget="15" iosCompatibility="15"/>
