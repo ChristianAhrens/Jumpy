@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+## [0.4.2] 2025-09-24
+### Added
+- Added support for iPhone 17 screen geometry
+
+### Changed
+- Changed app icon design to incorporate liquidGlass elements
+
+### Fixed
+
 ## [0.4.1] 2025-07-04
 ### Added
 
