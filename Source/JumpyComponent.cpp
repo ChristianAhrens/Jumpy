@@ -25,9 +25,22 @@ namespace Jumpy
 {
 
 
+/**
+ * @class AboutComponent
+ * @brief Popup content showing the application icon, version string, and relevant links.
+ *
+ * Displayed inside a `juce::PopupMenu` custom item via `CustomAboutItem`.  On iOS an
+ * additional hyperlink to the MIDI network session setup guide in the README is shown
+ * below the GitHub link.
+ */
 class AboutComponent : public juce::Component
 {
 public:
+    /**
+     * @brief Constructs the about panel from embedded image data.
+     * @param imageData      Pointer to PNG image data (the application icon).
+     * @param imageDataSize  Size of the image data in bytes.
+     */
     AboutComponent(const char* imageData, int imageDataSize)
         : juce::Component()
     {
@@ -42,7 +55,7 @@ public:
         m_appInfoLabel->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)));
         addAndMakeVisible(m_appInfoLabel.get());
 
-        m_appRepoLink = std::make_unique<juce::HyperlinkButton>(juce::JUCEApplication::getInstance()->getApplicationName() + juce::String(" on GitHub"), URL("https://www.github.com/ChristianAhrens/Jumpy"));
+        m_appRepoLink = std::make_unique<juce::HyperlinkButton>(juce::JUCEApplication::getInstance()->getApplicationName() + juce::String(" Product Page"), URL("https://christianahrens.github.io/Jumpy/"));
         m_appRepoLink->setFont(juce::Font(juce::FontOptions(16.0, juce::Font::plain)), false /* do not resize */);
         m_appRepoLink->setJustificationType(juce::Justification::centredTop);
         addAndMakeVisible(m_appRepoLink.get());
@@ -101,9 +114,23 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutComponent)
 };
 
+/**
+ * @class CustomAboutItem
+ * @brief `juce::PopupMenu::CustomComponent` wrapper that sizes an arbitrary component
+ *        to 75 % of the shorter screen dimension, bounded by a configurable minimum.
+ *
+ * Used to embed `AboutComponent` inside the about popup menu with a size that scales
+ * sensibly across all supported screen sizes.
+ */
 class CustomAboutItem : public juce::PopupMenu::CustomComponent
 {
 public:
+    /**
+     * @brief Constructs the wrapper around an existing component.
+     * @param componentToHold  Component to display; ownership is not transferred.
+     * @param minIdealSize     Minimum width and height in pixels; used when the
+     *                         screen-proportional size would be smaller.
+     */
     CustomAboutItem(juce::Component* componentToHold, juce::Rectangle<int> minIdealSize)
     {
         m_component = componentToHold;
@@ -162,15 +189,27 @@ private:
     juce::Rectangle<int>    m_minIdealSize;
 };
 
+/**
+ * @class MidiInputCallbackToStdFuncWrapper
+ * @brief Adapts the `juce::MidiInputCallback` virtual interface to a `std::function`.
+ *
+ * JUCE MIDI input requires a concrete `juce::MidiInputCallback` subclass.  This wrapper
+ * forwards `handleIncomingMidiMessage()` to the `onMidiMessageReceived` std::function
+ * so that JumpyComponent can use a lambda instead of a separate subclass.
+ *
+ * @note Callbacks arrive on the JUCE MIDI thread; the lambda must be thread-safe.
+ */
 class MidiInputCallbackToStdFuncWrapper : public juce::MidiInputCallback
 {
 public:
+    /** @brief Forwards the incoming message to `onMidiMessageReceived` if set. */
     void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override
     {
         if (onMidiMessageReceived)
             onMidiMessageReceived(source, message);
     };
 
+    /** Callback invoked on the MIDI thread for each incoming MIDI message. */
     std::function<void(juce::MidiInput*, const juce::MidiMessage&)> onMidiMessageReceived;
 };
 

@@ -147,9 +147,25 @@ void CustomTriggerButton::lookAndFeelChanged()
 
 void CustomTriggerButton::showTriggerSettings()
 {
+    /**
+     * @class TriggerSettingsComponent
+     * @brief Modal settings panel for configuring a single CustomTriggerButton slot.
+     *
+     * Presented inside a `juce::CallOutBox`.  Provides editable fields for the button
+     * name, target timecode, background colour, OSC address pattern, and MIDI command
+     * assignment.  When the box is dismissed (via the *Ok* button or the OS close
+     * gesture), the destructor calls `onFinished` with the assembled TriggerDetails so
+     * that the parent CustomTriggerButton can apply and persist the new configuration.
+     */
     class TriggerSettingsComponent : public juce::Component
     {
     public:
+        /**
+         * @brief Constructs the settings panel pre-populated from existing TriggerDetails.
+         * @param td                   Current trigger configuration to edit.
+         * @param midiInputIdentifier  Identifier of the open MIDI input device, forwarded
+         *                             to the MidiLearnerComponent for live MIDI capture.
+         */
         TriggerSettingsComponent(const TriggerDetails& td, const juce::String& midiInputIdentifier)
         {
             m_nameEdit = std::make_unique<JUCEAppBasics::FixedFontTextEditor>();
@@ -223,6 +239,9 @@ void CustomTriggerButton::showTriggerSettings()
             m_colourSelector->setBounds(bounds.removeFromBottom(400));
         }
 
+        /** Invoked from the destructor with the assembled TriggerDetails when the
+         *  CallOutBox is dismissed; the parent CustomTriggerButton uses this to apply
+         *  and persist the new configuration. */
         std::function<void(const TriggerDetails&)>  onFinished;
 
     private:
