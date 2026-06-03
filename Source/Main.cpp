@@ -22,7 +22,15 @@
 
 #include <CustomLookAndFeel.h>
 
- //==============================================================================
+/**
+ * @class MainApplication
+ * @brief JUCE application entry point for Jumpy.
+ *
+ * Creates and owns the single MainWindow on startup; tears it down on shutdown.
+ * Multiple instances are permitted (`moreThanOneInstanceAllowed()` returns `true`),
+ * matching the use case of running several Jumpy windows to drive independent MIDI
+ * outputs simultaneously.
+ */
 class MainApplication : public juce::JUCEApplication
 {
 public:
@@ -58,13 +66,29 @@ public:
     }
 
     //==============================================================================
-    /*
-        This class implements the desktop window that contains an instance of
-        our MainComponent class.
-    */
+    /**
+     * @class MainWindow
+     * @brief Desktop document window that hosts MainComponent and mirrors the OS dark-mode setting.
+     *
+     * On construction the window creates a `Jumpy::MainComponent`, wires up the
+     * palette-style change callback so that user-selected themes propagate to the global
+     * `juce::LookAndFeel`, and registers itself as a `juce::DarkModeSettingListener`
+     * so the OS dark/light preference is followed automatically whenever
+     * `m_followLocalStyle` is `true`.
+     *
+     * Platform behaviour:
+     * - **iOS / Android**: runs full-screen with the screen saver disabled.
+     * - **Linux**: enters kiosk mode.
+     * - **macOS / Windows**: resizable window, centred at its preferred size.
+     */
     class MainWindow : public juce::DocumentWindow, juce::DarkModeSettingListener
     {
     public:
+        /**
+         * @brief Constructs the main window and initialises all child components.
+         * @param name         Application name used as the window title.
+         * @param commandLine  Command-line arguments passed by the OS (currently unused).
+         */
         MainWindow(const juce::String& name, const juce::String& commandLine) : juce::DocumentWindow(name,
             juce::Desktop::getInstance().getDefaultLookAndFeel()
             .findColour(juce::ResizableWindow::backgroundColourId),
@@ -101,11 +125,18 @@ public:
             //applyPaletteStyle(JUCEAppBasics::CustomLookAndFeel::PaletteStyle::PS_Dark);
         }
 
+        /** @brief Delegates to `juce::JUCEApplication::systemRequestedQuit()`. */
         void closeButtonPressed() override
         {
             juce::JUCEApplication::getInstance()->systemRequestedQuit();
         }
 
+        /**
+         * @brief Applies the dark or light palette when the OS dark-mode setting changes.
+         *
+         * Only acts when `m_followLocalStyle` is `true`; user-selected explicit themes
+         * set `m_followLocalStyle` to `false` and suppress this callback.
+         */
         void darkModeSettingChanged() override
         {
             if (!m_followLocalStyle)
@@ -125,6 +156,10 @@ public:
             lookAndFeelChanged();
         }
 
+        /**
+         * @brief Creates a new CustomLookAndFeel for the given palette and sets it as the global default.
+         * @param paletteStyle  The palette to apply (e.g. `PS_Dark` or `PS_Light`).
+         */
         void applyPaletteStyle(JUCEAppBasics::CustomLookAndFeel::PaletteStyle paletteStyle)
         {
             m_lookAndFeel = std::make_unique<JUCEAppBasics::CustomLookAndFeel>(paletteStyle);
@@ -132,14 +167,14 @@ public:
         }
 
     private:
-        std::unique_ptr<juce::LookAndFeel>  m_lookAndFeel;
-        bool m_followLocalStyle = true;
+        std::unique_ptr<juce::LookAndFeel>  m_lookAndFeel;         ///<  Currently active global LookAndFeel instance.
+        bool m_followLocalStyle = true;  ///<  When true the window tracks the OS dark/light preference; set to false by explicit palette selection.
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
     };
 
 private:
-    std::unique_ptr<MainWindow> mainWindow;
+    std::unique_ptr<MainWindow> mainWindow;  ///<  The single application window.
 };
 
 //==============================================================================
