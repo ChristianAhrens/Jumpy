@@ -24,6 +24,8 @@
         <FILE id="diCIEd" name="Image_utils.h" compile="0" resource="0" file="submodules/JUCE-AppBasics/Source/Image_utils.h"/>
         <FILE id="rirILY" name="iOS_utils.cpp" compile="1" resource="0" file="submodules/JUCE-AppBasics/Source/iOS_utils.cpp"/>
         <FILE id="j4VcGn" name="iOS_utils.h" compile="0" resource="0" file="submodules/JUCE-AppBasics/Source/iOS_utils.h"/>
+        <FILE id="M9cYEU" name="iOS_utils_native.mm" compile="1" resource="0"
+              file="submodules/JUCE-AppBasics/Source/iOS_utils_native.mm"/>
         <FILE id="UhbDZ0" name="MidiCommandRangeAssignment.cpp" compile="1"
               resource="0" file="submodules/JUCE-AppBasics/Source/MidiCommandRangeAssignment.cpp"/>
         <FILE id="DfZIc0" name="MidiCommandRangeAssignment.h" compile="0" resource="0"
@@ -44,6 +46,20 @@
     </GROUP>
     <GROUP id="{72AB56DC-8637-938F-3846-2BD91435687D}" name="Resources">
       <GROUP id="{5418C8BA-AFDC-83EF-A716-D3FB9CE9A772}" name="Images">
+        <GROUP id="{887D979D-6555-B4A8-B944-067EE07D6BF1}" name="Jumpy.icon">
+          <GROUP id="{1A1C1B8A-B5A3-9543-B65D-B42DDB913B63}" name="Assets">
+            <FILE id="nIXQNJ" name="Black circle_Black circle.svg" compile="0"
+                  resource="0" file="Resources/Images/Jumpy.icon/Assets/Black circle_Black circle.svg"/>
+            <FILE id="oOtHai" name="Inner grey circle_Inner grey circle.svg" compile="0"
+                  resource="0" file="Resources/Images/Jumpy.icon/Assets/Inner grey circle_Inner grey circle.svg"/>
+            <FILE id="sFj0Ly" name="Jumpy.svg" compile="0" resource="0" file="Resources/Images/Jumpy.icon/Assets/Jumpy.svg"/>
+            <FILE id="gHVPIZ" name="Outer grey circle_Outer grey circle.svg" compile="0"
+                  resource="0" file="Resources/Images/Jumpy.icon/Assets/Outer grey circle_Outer grey circle.svg"/>
+            <FILE id="nzn5mI" name="White circle_White circle.svg" compile="0"
+                  resource="0" file="Resources/Images/Jumpy.icon/Assets/White circle_White circle.svg"/>
+          </GROUP>
+          <FILE id="VbxO0Z" name="icon.json" compile="0" resource="0" file="Resources/Images/Jumpy.icon/icon.json"/>
+        </GROUP>
         <FILE id="g0EK1m" name="add-24px.svg" compile="0" resource="1" file="submodules/JUCE-AppBasics/Resources/Images/add-24px.svg"/>
         <FILE id="uM9tct" name="clear_black_24dp.svg" compile="0" resource="1"
               file="submodules/JUCE-AppBasics/Resources/Images/clear_black_24dp.svg"/>
@@ -99,10 +115,10 @@
   </MODULES>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="fcf7ir" bigIcon="fcf7ir"
-               iosDevelopmentTeamID="SB7Q3PP4FQ" hardenedRuntime="1" applicationCategory="public.app-category.utilities"
-               appSandbox="0" customXcodeResourceFolders="Resources/Images/Jumpy.icon"
-               customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &lt;!-- New Xcode .icon integration --&gt;&#10;    &lt;key&gt;CFBundleIconName&lt;/key&gt;&#10;    &lt;string&gt;Jumpy&lt;/string&gt;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;">
+    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="" bigIcon="" iosDevelopmentTeamID="SB7Q3PP4FQ"
+               hardenedRuntime="1" applicationCategory="public.app-category.utilities"
+               appSandbox="0" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &lt;!-- New Xcode .icon integration --&gt;&#10;    &lt;key&gt;CFBundleIconName&lt;/key&gt;&#10;    &lt;string&gt;Jumpy&lt;/string&gt;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;"
+               iconComposerIcon="VbxO0Z">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>
         <CONFIGURATION isDebug="0" name="Release" customXcodeFlags="OTHER_CODE_SIGN_FLAGS = $(inherited) --timestamp -s 'Developer ID Application: Christian Ahrens', CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO"
@@ -174,7 +190,7 @@
                   iosScreenOrientation="UIInterfaceOrientationLandscapeRight,UIInterfaceOrientationPortrait"
                   iPadScreenOrientation="UIInterfaceOrientationLandscapeLeft,UIInterfaceOrientationLandscapeRight,UIInterfaceOrientationPortrait,UIInterfaceOrientationPortraitUpsideDown"
                   iosDevelopmentTeamID="SB7Q3PP4FQ" UIRequiresFullScreen="0" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#9;&lt;key&gt;UIBackgroundModes&lt;/key&gt;&#10;    &#9;&lt;array&gt;&#10;&#9;      &#9;&lt;string&gt;processing&lt;/string&gt;&#10;    &#9;&lt;/array&gt;&#10;    &lt;key&gt;BGTaskSchedulerPermittedIdentifiers&lt;/key&gt;&#10;    &lt;array&gt;&#10;      &lt;string&gt;com.ChristianAhrens.Jumper&lt;/string&gt;&#10;    &lt;/array&gt;&#10;    &lt;!-- New Xcode .icon integration --&gt;&#10;    &lt;key&gt;CFBundleIconName&lt;/key&gt;&#10;    &lt;string&gt;Jumpy&lt;/string&gt;&#10;&lt;/dict&gt;&#10;&lt;/plist&gt;"
-                  customXcodeResourceFolders="Resources/Images/Jumpy.icon">
+                  customXcodeResourceFolders="Resources/Images/Jumpy.icon" iconComposerIcon="VbxO0Z">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" iosDeploymentTarget="15" iosCompatibility="15"/>
         <CONFIGURATION isDebug="0" name="Release" iosDeploymentTarget="15" iosCompatibility="15"/>
