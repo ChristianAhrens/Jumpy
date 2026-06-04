@@ -1,7 +1,7 @@
 #define MyAppName "Jumpy"
 #define MyAppExeName "Jumpy.exe"
-#define MyAppExePath "..\..\..\Builds\VisualStudio2022\x64\Release\App\Jumpy.exe"
-#define MyAppVersion GetVersionNumbersString("..\..\..\Builds\VisualStudio2022\x64\Release\App\Jumpy.exe")
+#define MyAppExePath "..\..\..\Builds\VisualStudio2026\x64\Release\App\Jumpy.exe"
+#define MyAppVersion GetVersionNumbersString("..\..\..\Builds\VisualStudio2026\x64\Release\App\Jumpy.exe")
 #define MyAppPublisher "Christian Ahrens"
 #define MyAppURL "https://www.github.com/ChristianAhrens/Jumpy"
 
@@ -21,7 +21,7 @@ LicenseFile=..\..\..\LICENSE
 InfoAfterFile=..\..\..\CHANGELOG.md
 PrivilegesRequired=lowest
 OutputBaseFilename="{#MyAppName}Setup_v{#MyAppVersion}"
-SetupIconFile=..\..\..\Builds\VisualStudio2022\icon.ico
+SetupIconFile=..\..\..\Builds\VisualStudio2026\icon.ico
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
