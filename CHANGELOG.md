@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+## [0.4.3] 2026-06-04
+### Added
+- Added github pages doxygen+landingpage deployment incl. linking from About
+
+### Changed
+- Use macOS/iOS .icon app icon
+- Updated JUCE to 8.0.13
+- Updated JUCE-AppBasics to latest
+
+### Fixed
+
 ## [0.4.2] 2025-09-24
 ### Added
 - Added support for iPhone 17 screen geometry
