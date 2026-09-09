@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+## [0.4.4] 2026-09-09
+### Added
+- Added Github Workflows CI definitions for linux/macOS/windows
+- Added unit testing infrastructure, incl. basic test coverage
+
+### Changed
+- Updated JUCE to tag 9.0.2 and JUCE-AppBasics for compatibility
+
+### Fixed
+- Fixed missing VS2026 deployment (hotfix for 0.4.3)
+
 ## [0.4.3] 2026-06-04
 ### Added
 - Added github pages doxygen+landingpage deployment incl. linking from About
