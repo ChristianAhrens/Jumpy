@@ -137,10 +137,10 @@ void CustomTriggerButton::resized()
 
 void CustomTriggerButton::lookAndFeelChanged()
 {
-    m_addDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::add24px_svg).get());
+    m_addDrawable = juce::Drawable::createFromSVGString(BinaryData::add24px_svg);
     m_addDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
 
-    auto settingsDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::settings24px_svg).get());
+    auto settingsDrawable = juce::Drawable::createFromSVGString(BinaryData::settings24px_svg);
     settingsDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
     if (m_settingsButton) m_settingsButton->setImages(settingsDrawable.get());
 }
