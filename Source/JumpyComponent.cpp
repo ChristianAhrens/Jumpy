@@ -403,19 +403,19 @@ void JumpyComponent::setStartMilliseconds()
 
 void JumpyComponent::lookAndFeelChanged()
 {
-    auto optionsButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::menu_24dp_svg).get());
+    auto optionsButtonDrawable = juce::Drawable::createFromSVGString(BinaryData::menu_24dp_svg);
     optionsButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
     m_optionsButton->setImages(optionsButtonDrawable.get());
 
-    auto aboutButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::question_mark_24dp_svg).get());
+    auto aboutButtonDrawable = juce::Drawable::createFromSVGString(BinaryData::question_mark_24dp_svg);
     aboutButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
     m_aboutButton->setImages(aboutButtonDrawable.get());
 
-    auto startRunningButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::play_arrow24px_svg).get());
+    auto startRunningButtonDrawable = juce::Drawable::createFromSVGString(BinaryData::play_arrow24px_svg);
     startRunningButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
     m_startRunningButton->setImages(startRunningButtonDrawable.get());
 
-    auto triggerCurrentTCButtonDrawable = juce::Drawable::createFromSVG(*juce::XmlDocument::parse(BinaryData::Jumpy_svg).get());
+    auto triggerCurrentTCButtonDrawable = juce::Drawable::createFromSVGString(BinaryData::Jumpy_svg);
     triggerCurrentTCButtonDrawable->replaceColour(juce::Colours::black, getLookAndFeel().findColour(juce::TextButton::ColourIds::textColourOnId));
     m_triggerCurrentTCButton->setImages(triggerCurrentTCButtonDrawable.get());
 }

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="jt01te" name="JumpyTests" projectType="consoleapp" useAppConfig="0"
+              jucerFormatVersion="1" version="1.0.0" bundleIdentifier="com.ChristianAhrens.JumpyTests"
+              headerPath="../../../submodules/JUCE-AppBasics/Source&#10;../../../Source"
+              defines="JUCE_DISPLAY_SPLASH_SCREEN=0"
+              companyName="ChristianAhrens" companyCopyright="Copyright (c) 2026 Christian Ahrens.">
+  <MAINGROUP id="jt02mg" name="JumpyTests">
+    <GROUP id="{9E9E9E9E-0001-0001-0001-000000000001}" name="Source">
+      <FILE id="jt03s1" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="jt04s2" name="SanityTest.cpp" compile="1" resource="0" file="Source/SanityTest.cpp"/>
+      <FILE id="jt05s3" name="JumpyConfigurationTest.cpp" compile="1" resource="0"
+            file="Source/JumpyConfigurationTest.cpp"/>
+      <FILE id="jt06s4" name="CustomTriggerButtonTest.cpp" compile="1" resource="0"
+            file="Source/CustomTriggerButtonTest.cpp"/>
+    </GROUP>
+    <GROUP id="{9E9E9E9E-0001-0001-0001-000000000002}" name="ProductionSourcesUnderTest">
+      <FILE id="jt07p1" name="JumpyConfiguration.cpp" compile="1" resource="0"
+            file="../Source/JumpyConfiguration.cpp"/>
+      <FILE id="jt08p2" name="AppConfigurationBase.cpp" compile="1" resource="0"
+            file="../submodules/JUCE-AppBasics/Source/AppConfigurationBase.cpp"/>
+      <!-- CustomTriggerButton.h's TimeStamp and TriggerDetails are fully inline (header-only);
+           only their m_midiTrigger member (JUCEAppBasics::MidiCommandRangeAssignment) has
+           out-of-line methods, hence this .cpp. CustomTriggerButton.cpp itself (the juce::Button
+           subclass -- painting, mouse handling, popups, MidiLearnerComponent/FixedFontTextEditor
+           dependencies) is deliberately NOT compiled here: it is GUI-heavy and not exercised by
+           these tests. -->
+      <FILE id="jt09p3" name="MidiCommandRangeAssignment.cpp" compile="1" resource="0"
+            file="../submodules/JUCE-AppBasics/Source/MidiCommandRangeAssignment.cpp"/>
+      <!-- Embedded so JumpyConfiguration.cpp's ResetToDefault() resolves BinaryData::Default_config,
+           exactly like Jumpy.jucer itself does; without this, compiling JumpyConfiguration.cpp would
+           fail outright (the symbol wouldn't exist in this project's generated BinaryData.h). -->
+      <FILE id="jt10p4" name="Default.config" compile="0" resource="1" file="../Resources/Default.config"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_osc" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+  </MODULES>
+  <EXPORTFORMATS>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_osc" path="../submodules/JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+  <JUCEOPTIONS/>
+</JUCERPROJECT>
