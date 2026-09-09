@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['m_5fcolour_0',['m_Colour',['../structJumpy_1_1CustomTriggerButton_1_1TriggerDetails.html#ad368ad320c7f7b71471dee940794c265',1,'Jumpy::CustomTriggerButton::TriggerDetails']]],
+  ['m_5fmiditrigger_1',['m_midiTrigger',['../structJumpy_1_1CustomTriggerButton_1_1TriggerDetails.html#aff7fca5a4a238c700871b3bccb88a3cc',1,'Jumpy::CustomTriggerButton::TriggerDetails']]],
+  ['m_5fname_2',['m_Name',['../structJumpy_1_1CustomTriggerButton_1_1TriggerDetails.html#a55965db2362dea3d544d99df2d9d792d',1,'Jumpy::CustomTriggerButton::TriggerDetails']]],
+  ['m_5fosctrigger_3',['m_oscTrigger',['../structJumpy_1_1CustomTriggerButton_1_1TriggerDetails.html#a2252496ccd4cb28b0b617511bdc80739',1,'Jumpy::CustomTriggerButton::TriggerDetails']]],
+  ['m_5fts_4',['m_TS',['../structJumpy_1_1CustomTriggerButton_1_1TriggerDetails.html#a49e8b2a05f99e8b7c51b8885d7f8b3a4',1,'Jumpy::CustomTriggerButton::TriggerDetails']]],
+  ['macos_5',['MIDI network session setup - iOS to macOS',['../index.html#autotoc_md10',1,'']]],
+  ['main_20jumpy_20ui_6',['Main Jumpy UI',['../index.html#autotoc_md7',1,'']]],
+  ['main_2ecpp_7',['Main.cpp',['../Main_8cpp.html',1,'']]],
+  ['mainapplication_8',['mainapplication',['../classMainApplication.html',1,'MainApplication'],['../classMainApplication.html#aeaf8ab5baadd0408844bae6cb4d19325',1,'MainApplication::MainApplication()']]],
+  ['maincomponent_9',['maincomponent',['../classJumpy_1_1MainComponent.html#a4ccabff6e6ff80b407d6c62f762ebd75',1,'Jumpy::MainComponent::MainComponent()'],['../classJumpy_1_1MainComponent.html',1,'Jumpy::MainComponent']]],
+  ['maincomponent_2ecpp_10',['MainComponent.cpp',['../MainComponent_8cpp.html',1,'']]],
+  ['maincomponent_2eh_11',['MainComponent.h',['../MainComponent_8h.html',1,'']]],
+  ['mainwindow_12',['mainwindow',['../classMainApplication_1_1MainWindow.html#abe9103337361d95bd72863c2f71f5f3a',1,'MainApplication::MainWindow::MainWindow()'],['../classMainApplication_1_1MainWindow.html',1,'MainApplication::MainWindow']]],
+  ['menu_13',['Jumpy options menu',['../index.html#autotoc_md8',1,'']]],
+  ['midi_20network_20session_20setup_20ios_20to_20macos_14',['MIDI network session setup - iOS to macOS',['../index.html#autotoc_md10',1,'']]],
+  ['midiinput_15',['MIDIINPUT',['../classJumpy_1_1JumpyConfiguration.html#a6a71240b07e8857e71c820d666174916ab303a88d5465921f1bf2f222bffea06c',1,'Jumpy::JumpyConfiguration']]],
+  ['midiinputcallbacktostdfuncwrapper_16',['MidiInputCallbackToStdFuncWrapper',['../classJumpy_1_1MidiInputCallbackToStdFuncWrapper.html',1,'Jumpy']]],
+  ['midiiodevices_17',['MidiIODevices',['../classJumpy_1_1JumpyComponent.html#ab8a2ca93166f19485fcbce48fb86a16dab2945fc95118fe44cb70869a9a51f822',1,'Jumpy::JumpyComponent']]],
+  ['midimessagereceived_18',['midiMessageReceived',['../classJumpy_1_1JumpyComponent.html#aefc4b758f95379f8b2aec175865994d0',1,'Jumpy::JumpyComponent']]],
+  ['midioutput_19',['MIDIOUTPUT',['../classJumpy_1_1JumpyConfiguration.html#a6a71240b07e8857e71c820d666174916a2eaa34884806ae3e75d57a94d7df1e56',1,'Jumpy::JumpyConfiguration']]],
+  ['morethanoneinstanceallowed_20',['moreThanOneInstanceAllowed',['../classMainApplication.html#a43ebe0dd1b009fa6a90affa831f37741',1,'MainApplication']]],
+  ['mousedown_21',['mouseDown',['../classJumpy_1_1CustomTriggerButton.html#a991d7f8049d5c06e18af22ce355fcbbf',1,'Jumpy::CustomTriggerButton']]],
+  ['mtc_20output_20format_22',['MTC output format',['../classJumpy_1_1JumpyComponent.html#autotoc_md0',1,'']]]
+];

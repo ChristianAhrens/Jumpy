@@ -1,0 +1,17 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="15,29,147,55"/>
+<area shape="rect" id="Node000001" href="$classJumpy_1_1AboutComponent.html" title="Popup content showing the application icon, version string, and relevant links." alt="" coords="206,5,389,31"/>
+<area shape="poly" id="edge2_Node000000_Node000001" title=" " alt="" coords="160,31,205,25,206,31,160,36"/>
+<area shape="rect" id="Node000002" href="$classJumpy_1_1JumpyComponent.html" title="Central UI and logic component for MTC generation, routing, and trigger management." alt="" coords="204,151,391,176"/>
+<area shape="poly" id="edge3_Node000000_Node000002" title=" " alt="" coords="139,57,157,65,229,108,282,148,279,153,226,113,155,70,137,62"/>
+<area shape="rect" id="Node000007" href="$classJumpy_1_1MainComponent.html" title="Top&#45;level JUCE component that hosts JumpyComponent and initialises application&#45;wide services." alt="" coords="209,55,386,80"/>
+<area shape="poly" id="edge4_Node000000_Node000007" title=" " alt="" coords="161,49,209,54,208,60,160,54"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,79,156,119"/>
+<area shape="poly" id="edge5_Node000003_Node000002" title=" " alt="" coords="163,121,254,148,253,153,161,126"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="6,143,155,183"/>
+<area shape="poly" id="edge6_Node000004_Node000002" title=" " alt="" coords="169,161,204,161,204,166,169,166"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="33,208,128,233"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="141,202,248,173,249,179,142,207"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="5,258,156,298"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="142,250,155,244,221,207,275,174,277,178,224,211,157,248,144,255"/>
+</map>

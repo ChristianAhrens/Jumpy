@@ -1,0 +1,5 @@
+<map id="Jumpy::CustomTriggerButton::TriggerDetails" name="Jumpy::CustomTriggerButton::TriggerDetails">
+<area shape="rect" id="Node000001" title="All persistent properties associated with a single trigger button slot." alt="" coords="5,93,212,133"/>
+<area shape="rect" id="Node000002" href="$classJumpy_1_1TimeStamp.html" title="SMPTE&#45;style timecode position expressed as hours, minutes, seconds, and frames." alt="" coords="36,5,181,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="111,44,111,93,106,93,106,44"/>
+</map>

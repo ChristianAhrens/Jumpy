@@ -1,0 +1,5 @@
+<map id="Jumpy::MainComponent" name="Jumpy::MainComponent">
+<area shape="rect" id="Node000001" title="Top&#45;level JUCE component that hosts JumpyComponent and initialises application&#45;wide services." alt="" coords="5,79,183,104"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="28,5,160,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,44,97,79,91,79,91,44"/>
+</map>
