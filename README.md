@@ -7,6 +7,12 @@ See [LATEST RELEASE](https://github.com/ChristianAhrens/Jumpy/releases/latest) f
 
 Full code documentation available at [![Documentation](https://img.shields.io/badge/docs-doxygen-blue)](https://ChristianAhrens.github.io/Jumpy/doxygen/)
 
+|Platform|Status|
+|-|-|
+|macOS Xcode| [![Build status](https://github.com/ChristianAhrens/Jumpy/actions/workflows/ci-jumpy-macos.yml/badge.svg?branch=main)](https://github.com/ChristianAhrens/Jumpy/actions/workflows/ci-jumpy-macos.yml) |
+|Windows Visual Studio| [![Build status](https://github.com/ChristianAhrens/Jumpy/actions/workflows/ci-jumpy-windows.yml/badge.svg?branch=main)](https://github.com/ChristianAhrens/Jumpy/actions/workflows/ci-jumpy-windows.yml) |
+|Linux makefile| [![Build status](https://github.com/ChristianAhrens/Jumpy/actions/workflows/ci-jumpy-linux.yml/badge.svg?branch=main)](https://github.com/ChristianAhrens/Jumpy/actions/workflows/ci-jumpy-linux.yml) |
+
 
 <a name="toc" />
 
